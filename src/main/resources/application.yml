@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: ScanwordApp
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
