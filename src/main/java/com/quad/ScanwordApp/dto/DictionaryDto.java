@@ -10,11 +10,11 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class DictionaryDto {
 
     private UUID id;
 
-    private String username;
+    private String word;
 
-    private String password;
+    private String question;
 }
