@@ -1,7 +1,7 @@
 package com.quad.ScanwordApp.dto;
 
-
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,13 +11,16 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class ScanwordDto {
 
     private UUID id;
 
     @NotBlank
-    private String username;
+    private String name;
 
-    @NotBlank
-    private String password;
+    @PositiveOrZero
+    private int width;
+
+    @PositiveOrZero
+    private int height;
 }

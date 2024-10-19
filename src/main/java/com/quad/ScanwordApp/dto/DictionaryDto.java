@@ -11,13 +11,13 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
+public class DictionaryDto {
 
     private UUID id;
 
     @NotBlank
-    private String username;
+    private String word;
 
     @NotBlank
-    private String password;
+    private String question;
 }

@@ -21,16 +21,19 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-@Table(name = "users")
-public class User {
+@Table(name = "scanword")
+public class Scanword {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "username", nullable = false)
-    private String username;
+    @Column(name = "name",nullable = false)
+    private String name;
 
-    @Column(name = "password", nullable = false)
-    private String password;
+    @Column(name = "width",nullable = false)
+    private int width;
+
+    @Column(name = "height",nullable = false)
+    private int height;
 }
