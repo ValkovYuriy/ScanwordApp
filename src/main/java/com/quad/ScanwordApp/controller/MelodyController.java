@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import com.quad.ScanwordApp.dto.MelodyDto;
@@ -17,6 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@RequestMapping("/melody")
 @RequiredArgsConstructor
 public class MelodyController {
     
@@ -41,7 +43,7 @@ public class MelodyController {
         return melodyDto1;
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     public void deleteMelody(@RequestParam UUID id){
         melodyService.deleteMelody(id);
     }
