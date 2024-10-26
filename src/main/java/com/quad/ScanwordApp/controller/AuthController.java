@@ -42,15 +42,6 @@ public class AuthController
         return "register";
     }
 
-//    @PostMapping("/login")
-//    public String login(@RequestParam String username, @RequestParam String password) {
-//        if(authService.login(username, password))
-//        {
-//            return "redirect:/index";
-//        }
-//        else return "redirect:/login?error";
-//    }
-
     @PostMapping("/register")
     public String register(@RequestParam String username, @RequestParam String password) {
         if(authService.register(username, password))
