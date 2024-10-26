@@ -1,7 +1,7 @@
 package com.quad.ScanwordApp.controller;
 
-
-import com.quad.ScanwordApp.service.MelodyService;
+import com.quad.ScanwordApp.dto.ImageDto;
+import com.quad.ScanwordApp.service.ImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,39 +12,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import com.quad.ScanwordApp.dto.MelodyDto;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/melody")
+@RequestMapping("/image")
 @RequiredArgsConstructor
-public class MelodyController {
-    
-    private final MelodyService melodyService;
+public class ImageController {
+
+    private final ImageService imageService;
 
     @GetMapping
-    public List<MelodyDto> findAllMelodies(){
-        List<MelodyDto> allMelodies = melodyService.findAllMelodies();
+    public List<ImageDto> findAllMelodies(){
+        List<ImageDto> allMelodies = imageService.findAllImages();
         return allMelodies;
     }
 
 
     @PostMapping
-    public MelodyDto addMelody(@RequestBody @Valid MelodyDto melodyDto){
-        MelodyDto melodyDto1 = melodyService.addMelody(melodyDto);
-        return melodyDto1;
+    public ImageDto addImage(@RequestBody @Valid ImageDto imageDto){
+        ImageDto imageDto1 = imageService.addImage(imageDto);
+        return imageDto1;
     }
 
     @PutMapping
-    public MelodyDto updateMelody(@RequestBody @Valid MelodyDto melodyDto, @RequestParam UUID id){
-        MelodyDto melodyDto1 = melodyService.updateMelody(melodyDto,id);
-        return melodyDto1;
+    public ImageDto updateImage(@RequestBody @Valid ImageDto imageDto, @RequestParam UUID id){
+        ImageDto imageDto1 = imageService.updateImage(imageDto,id);
+        return imageDto1;
     }
 
     @DeleteMapping
-    public void deleteMelody(@RequestParam UUID id){
-        melodyService.deleteMelody(id);
+    public void deleteImage(@RequestParam UUID id){
+        imageService.deleteImage(id);
     }
 }
