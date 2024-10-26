@@ -32,7 +32,7 @@ public class ScanwordService {
     }
 
     public ScanwordDto updateScanword(ScanwordDto scanwordDto,UUID id) {
-        Scanword scanword = scanwordRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Мелодия с id %s", id)));
+        Scanword scanword = scanwordRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Сканворд с id %s не найден", id)));
         scanword.setName(scanwordDto.getName());
         scanword.setWidth(scanwordDto.getWidth());
         scanword.setHeight(scanwordDto.getHeight());
