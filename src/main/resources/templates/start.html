@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список сканвордов</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .item {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            transition: transform 0.2s, background-color 0.3s, border-color 0.3s;
+            cursor: pointer;
+        }
+
+        .item:hover {
+            transform: scale(1.05);
+        }
+
+        .item img {
+            max-width: 100%;
+            border-radius: 8px;
+        }
+
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            display: none; /* Скрываем по умолчанию */
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        /* Стили для спиннера */
+        .spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100px;
+            font-size: 24px;
+            color: #007bff;
+        }
+
+        /* Выделение выбранного сканворда */
+        .selected {
+            background-color: #d6f1d4;
+            border-color: #7dd262;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Список всех сканвордов</h1>
+    <!-- Прогресс-индикатор -->
+    <div class="spinner" id="spinner">
+        <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Загрузка...</span>
+        </div>
+    </div>
+    <div class="grid" id="image-grid"></div>
+
+    <!-- Блок с кнопками -->
+    <div class="button-container" id="button-container">
+        <button id="back-button">Назад</button>
+        <button id="select-button" hidden>Выбрать</button>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchImages();
+    });
+
+    function fetchImages() {
+        // Показать спиннер перед загрузкой изображений
+        const spinner = document.getElementById('spinner');
+        spinner.style.display = 'flex';
+
+        fetch('/image')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Сеть не в порядке');
+                }
+                return response.json();
+            })
+            .then(images => {
+                const grid = document.getElementById('image-grid');
+
+                images.forEach(image => {
+                    const item = document.createElement('div');
+                    item.className = 'item';
+
+                    const img = document.createElement('img');
+                    img.src = image.base64Image;
+                    img.alt = "Сканворд";
+                    img.style.maxWidth = "100%";
+
+                    item.prepend(img);
+                    item.innerHTML += `<p>Сканворд: ${image.description}</p>`;
+                    const buttonContainer = document.getElementById('button-container');
+                    buttonContainer.style.display = 'flex';
+                    buttonContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const backButton = document.getElementById('back-button');
+                    backButton.hidden = false;
+                    // Добавляем обработчик клика на элемент
+                    item.addEventListener('click', function() {
+                        // Снимаем выделение с предыдущих элементов
+                        document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+
+                        // Выделяем текущий элемент
+                        item.classList.add('selected');
+
+                        // Настраиваем кнопку "Выбрать"
+                        const selectButton = document.getElementById('select-button');
+                        selectButton.hidden = false;
+                        selectButton.setAttribute('data-id', image.id);
+                    });
+
+                    grid.appendChild(item);
+                });
+
+                // Скрыть спиннер после загрузки
+                spinner.style.display = 'none';
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                spinner.style.display = 'none';
+            });
+    }
+
+    // Обработчик для кнопки "Выбрать"
+    document.getElementById('select-button').addEventListener('click', function() {
+        const id = this.getAttribute('data-id');
+        alert(`Выбранный сканворд с ID: ${id} будет обработан.`);
+    });
+
+    // Обработчик для кнопки "Назад"
+    document.getElementById('back-button').addEventListener('click', function() {
+        window.location.href = '/';
+    });
+</script>
+<!-- Bootstrap JS and dependencies -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

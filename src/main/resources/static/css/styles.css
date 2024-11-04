@@ -9,3 +9,16 @@
     margin-left: 1rem;
     margin-block: auto;
 }
+.user-buttons-container{
+    text-align: center;
+}
+.user-button{
+    text-align: center;
+}
+.logout-button{
+    display: flex;
+    align-content: space-around;
+    flex-wrap: nowrap;
+    margin-left: 40px;
+    margin-top: 40%;
+}
