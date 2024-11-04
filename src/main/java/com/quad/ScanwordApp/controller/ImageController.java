@@ -4,14 +4,7 @@ import com.quad.ScanwordApp.dto.ImageDto;
 import com.quad.ScanwordApp.service.ImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,16 +17,26 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping
-    public List<ImageDto> findAllMelodies(){
-        List<ImageDto> allMelodies = imageService.findAllImages();
-        return allMelodies;
+    public List<ImageDto> findAllImages(){
+        List<ImageDto> allImages = imageService.findAllImages();
+        return allImages;
+    }
+    @GetMapping("/{id}")
+    public ImageDto getImage(@PathVariable UUID id) {
+        return imageService.findImageById(id);
     }
 
+    @GetMapping("/{id}/base64") // обновляем маршрутизацию
+    public String getImageBase64(@PathVariable UUID id) {
+        // Получаем изображение по ID
+        ImageDto imageDto = imageService.findImageById(id);
+        // Возвращаем Base64 строку
+        return imageDto.getBase64Image();
+    }
 
     @PostMapping
     public ImageDto addImage(@RequestBody @Valid ImageDto imageDto){
-        ImageDto imageDto1 = imageService.addImage(imageDto);
-        return imageDto1;
+        return imageService.addImage(imageDto);
     }
 
     @PutMapping

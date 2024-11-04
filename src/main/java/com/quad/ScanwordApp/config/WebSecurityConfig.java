@@ -45,7 +45,7 @@ public class WebSecurityConfig
                         })
                 )
                 .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/", "/login", "/register").permitAll()
+                        .requestMatchers("/", "/login", "/register", "/static/css/styles.css", "/images").permitAll()
                         .anyRequest().hasRole("USER")
                 )
                 .formLogin((form)->form

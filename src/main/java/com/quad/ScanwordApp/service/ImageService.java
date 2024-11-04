@@ -40,6 +40,10 @@ public class ImageService {
         return imageMapper.toDto(imageRepository.save(image));
     }
 
+    public ImageDto findImageById(UUID id) {
+        return imageRepository.findById(id).stream().map(imageMapper::toDto).findFirst().orElse(null);
+    }
+
     public void deleteImage(UUID id) {
         imageRepository.deleteById(id);
     }
