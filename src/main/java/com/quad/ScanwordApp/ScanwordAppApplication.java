@@ -1,8 +1,17 @@
 package com.quad.ScanwordApp;
 
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
 
 
 @SpringBootApplication
@@ -15,7 +24,21 @@ public class ScanwordAppApplication {
 //	private static final String USER = "ydek";
 //	private static final String PASS = "remote";
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
+
+//		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/resources/dictionary/Glavny.dict"), "windows-1251"));
+//		FileWriter fw = new FileWriter("src/main/resources/dictionary/words.dict");
+//		ArrayList<String> words = new ArrayList<>();
+//
+//		for(int i = 0; i < 12758; i++) {
+//			words.add(br.readLine().split(" ",0)[0]);
+//			fw.write(words.get(i) + "\n");
+//		}
+//		fw.close();
+		clearing();
+
+
+
 
 //		// Шаг 2: Подключаемся к базе данных
 //		DriverManagerDataSource dataSource = new DriverManagerDataSource();
@@ -71,7 +94,36 @@ public class ScanwordAppApplication {
 //		}
 
 
-        SpringApplication.run(ScanwordAppApplication.class, args);
+        //SpringApplication.run(ScanwordAppApplication.class, args);
+	}
+
+	public static void clearing(){
+		Path dirtyDictionaries = Paths.get("src/main/resources/dictionaries/dirty_dictionaries");
+		Path cleanDictionaries = Paths.get("src/main/resources/dictionaries/clean_dictionaries");
+
+
+		try {
+			Files.list(dirtyDictionaries).forEach(dirtyDictionary ->{
+				Path cleanDictionary = cleanDictionaries.resolve(dirtyDictionaries.relativize(dirtyDictionary));
+				try(
+						BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/resources/dictionaries/dirty_dictionaries/" + dirtyDictionary.getFileName())));
+						FileWriter fw = new FileWriter("src/main/resources/dictionaries/clean_dictionaries/" + cleanDictionary.getFileName());
+				){
+					HashSet<String> uniqueLines = new HashSet<>();
+					while(br.ready()){
+						String[] line = br.readLine().split(" ",2);
+						if(uniqueLines.add(line[0])){
+							fw.write(line[0] + " " + line[1] + "\n");
+						}
+					}
+				}
+				catch (Exception e){
+					e.printStackTrace();
+				}
+			});
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 }
