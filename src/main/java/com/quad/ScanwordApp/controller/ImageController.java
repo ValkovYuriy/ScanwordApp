@@ -24,7 +24,7 @@ public class ImageController {
     private final ImageService imageService;
 
     @GetMapping
-    public List<ImageDto> findAllMelodies(){
+    public List<ImageDto> findAllImages(){
         List<ImageDto> allMelodies = imageService.findAllImages();
         return allMelodies;
     }
