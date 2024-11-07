@@ -1,5 +1,6 @@
 package com.quad.ScanwordApp.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -16,8 +17,10 @@ public class ImageDto {
 
     private byte[] image;
 
+    @NotBlank
     private String question;
 
+    @NotBlank
     private String answer;
 
     public String getBase64Image()

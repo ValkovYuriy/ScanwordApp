@@ -26,6 +26,13 @@ public class DraftScanwordService {
                 .toList();
     }
 
+    public DraftScanwordDto findDraftScanwordById(UUID id) {
+        return draftScanwordMapper
+                .toDto(draftScanwordRepository
+                        .findById(id)
+                        .orElseThrow(() -> new NotFoundException(String.format("Сканворд с id %s не найден", id))));
+    }
+
     public DraftScanwordDto addDraftScanword(DraftScanwordDto draftScanwordDto) {
         DraftScanword draftScanword = draftScanwordMapper.toDraftScanword(draftScanwordDto);
         return draftScanwordMapper.toDto(draftScanwordRepository.save(draftScanword));

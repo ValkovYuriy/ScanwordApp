@@ -41,7 +41,11 @@ public class ImageService {
     }
 
     public ImageDto findImageById(UUID id) {
-        return imageRepository.findById(id).stream().map(imageMapper::toDto).findFirst().orElse(null);
+        return imageRepository.findById(id)
+                .stream()
+                .map(imageMapper::toDto)
+                .findFirst()
+                .orElse(null);
     }
 
     public void deleteImage(UUID id) {

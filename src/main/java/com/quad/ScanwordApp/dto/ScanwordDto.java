@@ -1,11 +1,8 @@
 package com.quad.ScanwordApp.dto;
 
-import com.quad.ScanwordApp.model.Cell;
-import com.quad.ScanwordApp.model.Dictionary;
-import com.quad.ScanwordApp.model.Image;
-import com.quad.ScanwordApp.model.Melody;
-import com.quad.ScanwordApp.model.User;
+import com.quad.ScanwordApp.model.json.Cell;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -33,20 +30,10 @@ public class ScanwordDto {
 
     private byte[] preview;
 
+    @NotNull
+    private UUID creatorId;
 
     private List<Cell> content = new ArrayList<>();
-
-
-    private List<User> users = new ArrayList<>();
-
-
-    private List<Dictionary> answers = new ArrayList<>();
-
-
-    private List<Melody> melodies = new ArrayList<>();
-
-
-    private List<Image> images = new ArrayList<>();
 
     private boolean isCreated;
 }

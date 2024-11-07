@@ -1,6 +1,7 @@
 package com.quad.ScanwordApp.model;
 
 
+import com.quad.ScanwordApp.model.json.DictionaryData;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +13,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -28,9 +33,11 @@ public class Dictionary {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "word",nullable = false)
-    private String word;
+    @Column(name = "name",nullable = false)
+    private String name;
 
-    @Column(name = "question",nullable = false)
-    private String question;
+    @Builder.Default
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(name = "data")
+    List<DictionaryData> dictionaryData = new ArrayList<>();
 }

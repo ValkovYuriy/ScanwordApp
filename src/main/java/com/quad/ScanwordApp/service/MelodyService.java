@@ -26,6 +26,12 @@ public class MelodyService {
                 .toList();
     }
 
+    public MelodyDto findMelodyById(UUID id) {
+        return melodyMapper.toDto(melodyRepository
+                .findById(id)
+                .orElseThrow(()->new NotFoundException(String.format("Мелодия с id %s не найдена",id))));
+    }
+
     public MelodyDto addMelody(MelodyDto melodyDto) {
         Melody melody = melodyMapper.toMelody(melodyDto);
         return melodyMapper.toDto(melodyRepository.save(melody));

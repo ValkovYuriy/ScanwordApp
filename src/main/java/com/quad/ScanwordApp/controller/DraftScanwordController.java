@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -30,6 +31,11 @@ public class DraftScanwordController {
         return allDraftScanwords;
     }
 
+    @GetMapping("/{id}")
+    public DraftScanwordDto findDraftScanwordById(@PathVariable UUID id){
+        DraftScanwordDto draftScanwordDto = draftScanwordService.findDraftScanwordById(id);
+        return draftScanwordDto;
+    }
 
     @PostMapping
     public DraftScanwordDto addDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto){
@@ -43,8 +49,8 @@ public class DraftScanwordController {
         return scanwordDto1;
     }
 
-    @DeleteMapping()
-    public void deleteDraftScanword(@RequestParam UUID id){
+    @DeleteMapping("/{id}")
+    public void deleteDraftScanword(@PathVariable UUID id){
         draftScanwordService.deleteDraftScanword(id);
     }
 }

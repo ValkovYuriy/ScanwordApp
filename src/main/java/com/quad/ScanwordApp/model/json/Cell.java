@@ -1,4 +1,4 @@
-package com.quad.ScanwordApp.model;
+package com.quad.ScanwordApp.model.json;
 
 
 import com.quad.ScanwordApp.model.enums.TaskType;

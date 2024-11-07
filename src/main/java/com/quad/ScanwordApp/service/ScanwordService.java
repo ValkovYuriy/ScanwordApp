@@ -26,6 +26,11 @@ public class ScanwordService {
                 .toList();
     }
 
+    public ScanwordDto findScanwordById(UUID id) {
+        return scanwordMapper.toDto(scanwordRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException(String.format("Сканворд с id %s не найден", id))));
+    }
     public ScanwordDto addScanword(ScanwordDto scanwordDto) {
         Scanword scanword = scanwordMapper.toScanword(scanwordDto);
         return scanwordMapper.toDto(scanwordRepository.save(scanword));

@@ -4,6 +4,7 @@ CREATE TABLE IF NOT EXISTS scanword(
     width INT NOT NULL ,
     height INT NOT NULL,
     preview bytea NOT NULL,
+    creator_id UUID REFERENCES users(id),
     content jsonb,
     is_created boolean NOT NULL
 )

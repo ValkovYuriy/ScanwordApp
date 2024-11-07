@@ -10,6 +10,7 @@ import org.mapstruct.Mapping;
 public interface DraftScanwordMapper {
 
     @Mapping(target = "scanwordId",source = "scanword.id")
+    @Mapping(target = "ownerId",source = "owner.id")
     DraftScanwordDto toDto(DraftScanword draftScanword);
 
     DraftScanword toDraftScanword(DraftScanwordDto draftScanwordDto);

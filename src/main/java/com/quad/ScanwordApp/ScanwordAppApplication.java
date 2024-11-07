@@ -1,6 +1,7 @@
 package com.quad.ScanwordApp;
 
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.BufferedReader;
@@ -35,7 +36,7 @@ public class ScanwordAppApplication {
 //			fw.write(words.get(i) + "\n");
 //		}
 //		fw.close();
-		clearing();
+		//clearing();
 
 
 
@@ -94,7 +95,7 @@ public class ScanwordAppApplication {
 //		}
 
 
-        //SpringApplication.run(ScanwordAppApplication.class, args);
+        SpringApplication.run(ScanwordAppApplication.class, args);
 	}
 
 	public static void clearing(){

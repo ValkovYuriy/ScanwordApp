@@ -5,8 +5,10 @@ import com.quad.ScanwordApp.dto.ScanwordDto;
 import com.quad.ScanwordApp.service.ScanwordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,6 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/scanword")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('ADMIN')")
 public class ScanwordController {
     
     private final ScanwordService scanwordService;
@@ -30,6 +33,11 @@ public class ScanwordController {
         return allScanwords;
     }
 
+    @GetMapping("/{id}")
+    public ScanwordDto findScanwordById(@PathVariable UUID id){
+        ScanwordDto scanwordDto = scanwordService.findScanwordById(id);
+        return scanwordDto;
+    }
 
     @PostMapping
     public ScanwordDto addScanword(@RequestBody @Valid ScanwordDto scanwordDto){
@@ -43,8 +51,10 @@ public class ScanwordController {
         return scanwordDto1;
     }
 
-    @DeleteMapping()
-    public void deleteScanword(@RequestParam UUID id){
+    @DeleteMapping("/{id}")
+    public void deleteScanword(@PathVariable UUID id){
         scanwordService.deleteScanword(id);
     }
+
+
 }
