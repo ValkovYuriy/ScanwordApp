@@ -39,5 +39,5 @@ public class Dictionary {
     @Builder.Default
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "data")
-    List<DictionaryData> dictionaryData = new ArrayList<>();
+    private List<DictionaryData> dictionaryData = new ArrayList<>();
 }

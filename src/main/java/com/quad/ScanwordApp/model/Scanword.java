@@ -1,7 +1,6 @@
 package com.quad.ScanwordApp.model;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.quad.ScanwordApp.model.json.Cell;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,10 +47,10 @@ public class Scanword {
     @Column(name = "preview",nullable = false)
     private byte[] preview;
 
-    @JsonIgnore
+
     @ManyToOne
-    @JoinColumn(name = "creator_id",nullable = false)
-    private User creator;
+    @JoinColumn(name = "dictionary_id",nullable = false)
+    private Dictionary dictionary;
 
     @Builder.Default
     @JdbcTypeCode(SqlTypes.JSON)

@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS scanword(
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    name VARCHAR(50) NOT NULL ,
+    name VARCHAR(20) NOT NULL,
     width INT NOT NULL ,
     height INT NOT NULL,
     preview bytea NOT NULL,
-    creator_id UUID REFERENCES users(id),
+    dictionary_id UUID REFERENCES dictionary(id),
     content jsonb,
     is_created boolean NOT NULL
 )

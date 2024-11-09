@@ -31,7 +31,7 @@ public class ScanwordDto {
     private byte[] preview;
 
     @NotNull
-    private UUID creatorId;
+    private UUID dictionaryId;
 
     private List<Cell> content = new ArrayList<>();
 

@@ -47,11 +47,6 @@ public class User {
 
     @JsonIgnore
     @Builder.Default
-    @OneToMany(mappedBy = "creator")
-    private List<Scanword> createdScanwords = new ArrayList<>();
-
-    @JsonIgnore
-    @Builder.Default
     @OneToMany(mappedBy = "owner")
     private List<DraftScanword> draftScanwords = new ArrayList<>();
 }

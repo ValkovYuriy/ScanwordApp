@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ScanwordMapper {
 
-    @Mapping(target = "creatorId",source = "creator.id")
+    @Mapping(target = "dictionaryId",source = "dictionary.id")
     ScanwordDto toDto(Scanword scanword);
 
     Scanword toScanword(ScanwordDto scanwordDto);
