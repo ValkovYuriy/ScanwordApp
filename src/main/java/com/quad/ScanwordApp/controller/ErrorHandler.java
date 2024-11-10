@@ -19,11 +19,11 @@ public class ErrorHandler {
         return new ModelAndView("error");
     }
 
-//    @ExceptionHandler
-//    public ModelAndView handleException(Throwable e, Model model) {
-//        log.error(e.getMessage(),e);
-//        model.addAttribute("error", e.getMessage());
-//        return new ModelAndView("error");
-//    }
+    @ExceptionHandler
+    public ModelAndView handleException(Throwable e, Model model) {
+        log.error(e.getMessage(),e);
+        model.addAttribute("error", e.getMessage());
+        return new ModelAndView("error");
+    }
 
 }
