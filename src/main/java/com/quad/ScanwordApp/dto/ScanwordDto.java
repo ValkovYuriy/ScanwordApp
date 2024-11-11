@@ -35,5 +35,9 @@ public class ScanwordDto {
 
     private List<Cell> content = new ArrayList<>();
 
+    @NotNull
     private boolean isCreated;
+
+    @NotNull
+    private int numberOfHints;
 }

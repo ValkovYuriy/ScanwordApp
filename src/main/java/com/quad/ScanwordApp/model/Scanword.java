@@ -47,7 +47,6 @@ public class Scanword {
     @Column(name = "preview",nullable = false)
     private byte[] preview;
 
-
     @ManyToOne
     @JoinColumn(name = "dictionary_id",nullable = false)
     private Dictionary dictionary;
@@ -59,4 +58,7 @@ public class Scanword {
 
     @Column(name = "is_created",nullable = false)
     private boolean isCreated;
+
+    @Column(name = "number_of_hints",nullable = false)
+    private int numberOfHints;
 }

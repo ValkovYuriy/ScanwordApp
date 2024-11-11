@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS scanword(
     preview bytea NOT NULL,
     dictionary_id UUID REFERENCES dictionary(id),
     content jsonb,
-    is_created boolean NOT NULL
+    is_created boolean NOT NULL,
+    number_of_hints INT NOT NULL
 )
