@@ -1,4 +1,4 @@
-package com.quad.ScanwordApp.controller;
+package com.quad.ScanwordApp.controller.web;
 
 import com.quad.ScanwordApp.service.AuthService;
 import lombok.RequiredArgsConstructor;

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Работа со словарями</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            background-color: #d4a017;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            position: relative;
+        }
+        .header button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background-color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .container {
+            display: flex;
+            padding: 20px;
+        }
+        .table-container {
+            flex: 2;
+            margin-right: 20px;
+        }
+        #dictionary-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #dictionary-table th, #dictionary-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+        #dictionary-table th {
+            cursor: pointer;
+            background-color: #f2f2f2;
+        }
+        .input-row {
+            display: flex;
+        }
+        .input-row input {
+            flex: 1;
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+        }
+        .controls {
+            flex: 1;
+        }
+        .controls select, .controls button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    Работа со словарями
+    <button>?</button>
+</div>
+
+<div class="container">
+    <div class="table-container">
+        <table id="dictionary-table">
+            <thead>
+            <tr>
+                <th onclick="sortTable(0)">Слово</th>
+                <th onclick="sortTable(1)">Определение</th>
+            </tr>
+            </thead>
+            <tbody>
+<!--            <tr class="input-row">-->
+<!--                <td><input type="text" placeholder="Введите слово..."></td>-->
+<!--                <td><input type="text" placeholder="Введите определение..."></td>-->
+<!--            </tr>-->
+            </tbody>
+        </table>
+    </div>
+    <div class="controls">
+        <select id="dictionary-select">
+            <option>Словарь понятий...</option>
+        </select>
+        <button id="melody-gallery-button">Галерея мелодий</button>
+        <button id="image-gallery-button">Галерея картинок</button>
+        <button>Удалить запись из выбранного словаря</button>
+        <button>Добавить запись в выбранный словарь</button>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const dictionarySelect = document.getElementById('dictionary-select');
+        const dictionaryTableBody = document.getElementById('dictionary-table').querySelector('tbody');
+        const imageGalleryButton = document.getElementById('image-gallery-button');
+        // Загрузка списка словарей
+        fetch('/dictionary')
+            .then(response => response.json())
+            .then(data => {
+                data.forEach(dictionary => {
+                    const option = document.createElement('option');
+                    option.value = dictionary.id;
+                    option.textContent = dictionary.name;
+                    dictionarySelect.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Ошибка загрузки словарей:', error));
+
+        // fetch('/image')
+        //     .then(response => response.json())
+        //     .then(image => {
+        //         image.forEach(img => {
+        //             // //const option = document.createElement('option');
+        //             // option.value = img.id;
+        //             // option.textContent = img.word;
+        //             //
+        //             // dictionarySelect.appendChild(option);
+        //         });
+        //     })
+        //     .catch(error => console.error('Ошибка загрузки словарей:', error));
+
+        // Обработчик изменения выбора словаря
+        dictionarySelect.addEventListener('change', () => {
+            const selectedDictionaryId = dictionarySelect.value;
+            if (selectedDictionaryId) {
+                fetch(`/dictionary/${selectedDictionaryId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        dictionaryTableBody.innerHTML = ''; // Очистка таблицы
+                        data.dictionaryData.forEach(item => {
+                            const row = document.createElement('tr');
+                            const wordCell = document.createElement('td');
+                            const definitionCell = document.createElement('td');
+                            wordCell.textContent = item.word;
+                            definitionCell.textContent = item.definition;
+                            row.appendChild(wordCell);
+                            row.appendChild(definitionCell);
+                            dictionaryTableBody.appendChild(row);
+                        });
+                    })
+                    .catch(error => console.error('Ошибка загрузки данных словаря:', error));
+            }
+        });
+        // Обработчик для кнопки "Галерея картинок"
+        // imageGalleryButton.addEventListener('click', () => {
+        //     const selectedDictionaryId = dictionarySelect.value;
+        //     if (selectedDictionaryId) {
+        //         fetch(`dictionary/${selectedDictionaryId}/images`)
+        //             .then(response => response.json())
+        //             .then(data => {
+        //                 dictionaryTableBody.innerHTML = ''; // Очистка таблицы
+        //                 data.forEach(item => {
+        //                     const row = document.createElement('tr');
+        //                     const wordCell = document.createElement('td');
+        //                     const definitionCell = document.createElement('td');
+        //                     const imageCell = document.createElement('td');
+        //                     const img = document.createElement('img');
+        //                     img.src = item.imageUrl; // Предполагается, что в JSON есть поле imageUrl
+        //                     img.alt = item.word;
+        //                     img.title = item.word;
+        //                     wordCell.textContent = item.word;
+        //                     definitionCell.textContent = item.definition;
+        //                     imageCell.appendChild(img);
+        //                     row.appendChild(wordCell);
+        //                     row.appendChild(definitionCell);
+        //                     row.appendChild(imageCell);
+        //                     dictionaryTableBody.appendChild(row);
+        //                 });
+        //             })
+        //             .catch(error => console.error('Ошибка загрузки изображений:', error));
+        //     }
+        // });
+    });
+
+    // Функция сортировки таблицы
+    function sortTable(columnIndex) {
+        const table = document.getElementById('dictionary-table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            const cellA = a.cells[columnIndex].textContent.trim();
+            const cellB = b.cells[columnIndex].textContent.trim();
+
+            return cellA.localeCompare(cellB); // Сравнение по алфавиту
+        });
+
+        rows.forEach(row => tbody.appendChild(row)); // Перемещение отсортированных строк в tbody
+    }
+</script>
+</body>
+</html>

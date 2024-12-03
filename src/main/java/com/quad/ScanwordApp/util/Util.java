@@ -24,8 +24,12 @@ public class Util {
 
     private static JdbcTemplate jdbcTemplate;
     private static SessionFactory sessionFactory;
+
+
 	private static final String DB_URL = "jdbc:postgresql://localhost:5432/ScanwordApp";
+
 	private static final String USER = "ydek";
+
 	private static final String PASS = "remote";
 
     public static void connectWithJdbcTemplate(){
@@ -44,18 +48,18 @@ public class Util {
         sessionFactory = config.buildSessionFactory();
     }
 
-    public static void insertDataUsingHibernate() throws IOException {
+    public static void insertDataUsingHibernate(String dict) throws IOException {
         Session session = sessionFactory.openSession();
         session.beginTransaction();
 
         List<DictionaryData> dictionaryData = new ArrayList<>();
-        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/resources/dictionaries/clean_dictionaries/Культура_и_Социум.dict")));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream("src/main/resources/dictionaries/clean_dictionaries/" + dict + ".dict")));
         while(br.ready()){
             String[] line = br.readLine().split(" ",2);
             dictionaryData.add(new DictionaryData(line[0], line[1]));
         }
         Dictionary dictionary = Dictionary.builder()
-                .name("Культура и Социум")
+                .name(dict)
                 .dictionaryData(dictionaryData)
                 .build();
         session.save(dictionary);

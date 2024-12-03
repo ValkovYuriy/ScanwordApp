@@ -60,37 +60,57 @@
     </style>
 </head>
 <body>
-<<div class="form-container">
+<div class="form-container">
     <h2>Создание сканворда</h2>
     <form id="crosswordForm">
         <div class="form-group">
             <label for="name">Название сканворда:</label>
-            <input type="text" id="name" value="Новый 1" required>
+            <input type="text" id="name" value="Новый 1" required minlength="4" maxlength="20">
         </div>
         <div class="form-group">
             <label for="x">X (ширина):</label>
-            <input type="number" id="x" value="10" min="1" required>
+            <input type="number" id="x" value="10" min="5" max="25" required>
         </div>
         <div class="form-group">
             <label for="y">Y (высота):</label>
-            <input type="number" id="y" value="10" min="1" required>
+            <input type="number" id="y" value="10" min="5" max="25" required>
         </div>
         <div class="form-group">
             <label for="hints">Кол-во подсказок:</label>
-            <input type="number" id="hints" value="3" min="0" required>
+            <input type="number" id="hints" value="3" min="0" max="5" required>
         </div>
         <div class="form-group">
             <label for="dictionary">Выбор словаря понятий:</label>
             <select id="dictionary" required>
                 <option value="" disabled selected>Выберите...</option>
-                <option value="default">Дефолтный словарь</option>
-                <option value="custom">Пользовательский словарь</option>
-                <!-- Добавьте другие словари по мере необходимости -->
             </select>
         </div>
         <button type="submit">Создать</button>
         <button type="button" class="back" onclick="goBack()">Назад</button>
     </form>
 </div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Функция для подгрузки словарей
+        function loadDictionaries() {
+            fetch('/dictionary') // Эндпоинт вашего Spring API
+                .then(response => response.json())
+                .then(data => {
+                    const select = document.getElementById('dictionary');
+                    data.forEach(dict => {
+                        const option = document.createElement('option');
+                        option.value = dict.id; // Используем ID словаря
+                        option.textContent = dict.name; // Название словаря
+                        select.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Ошибка при загрузке словарей:', error));
+        }
+
+        // Вызываем функцию для загрузки словарей
+        loadDictionaries();
+    });
+</script>
 </body>
 </html>

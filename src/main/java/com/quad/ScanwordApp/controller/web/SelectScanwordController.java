@@ -1,4 +1,4 @@
-package com.quad.ScanwordApp.controller;
+package com.quad.ScanwordApp.controller.web;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
