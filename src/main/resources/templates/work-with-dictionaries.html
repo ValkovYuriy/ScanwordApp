@@ -84,10 +84,7 @@
             </tr>
             </thead>
             <tbody>
-<!--            <tr class="input-row">-->
-<!--                <td><input type="text" placeholder="Введите слово..."></td>-->
-<!--                <td><input type="text" placeholder="Введите определение..."></td>-->
-<!--            </tr>-->
+
             </tbody>
         </table>
     </div>
@@ -106,6 +103,7 @@
         const dictionarySelect = document.getElementById('dictionary-select');
         const dictionaryTableBody = document.getElementById('dictionary-table').querySelector('tbody');
         const imageGalleryButton = document.getElementById('image-gallery-button');
+        const melodyGalleryButton = document.getElementById('image-gallery-button');
         // Загрузка списка словарей
         fetch('/dictionary')
             .then(response => response.json())
@@ -119,18 +117,6 @@
             })
             .catch(error => console.error('Ошибка загрузки словарей:', error));
 
-        // fetch('/image')
-        //     .then(response => response.json())
-        //     .then(image => {
-        //         image.forEach(img => {
-        //             // //const option = document.createElement('option');
-        //             // option.value = img.id;
-        //             // option.textContent = img.word;
-        //             //
-        //             // dictionarySelect.appendChild(option);
-        //         });
-        //     })
-        //     .catch(error => console.error('Ошибка загрузки словарей:', error));
 
         // Обработчик изменения выбора словаря
         dictionarySelect.addEventListener('change', () => {
@@ -140,6 +126,25 @@
                     .then(response => response.json())
                     .then(data => {
                         dictionaryTableBody.innerHTML = ''; // Очистка таблицы
+                        const inputRow = document.createElement('tr');
+                        const inputWord = document.createElement('td');
+                        const inputDefinition = document.createElement('td');
+                        // Создаем элементы input
+                        const wordInput = document.createElement('input');
+                        wordInput.type = 'text';
+                        wordInput.placeholder = 'Введите слово...';
+
+                        const definitionInput = document.createElement('input');
+                        definitionInput.type = 'text';
+                        definitionInput.placeholder = 'Введите определение...';
+
+                        // Добавляем input в соответствующие ячейки
+                        inputWord.appendChild(wordInput);
+                        inputDefinition.appendChild(definitionInput);
+                        // Добавляем ячейки в строку
+                        inputRow.appendChild(inputWord);
+                        inputRow.appendChild(inputDefinition);
+                        dictionaryTableBody.appendChild(inputRow);
                         data.dictionaryData.forEach(item => {
                             const row = document.createElement('tr');
                             const wordCell = document.createElement('td');
@@ -150,39 +155,37 @@
                             row.appendChild(definitionCell);
                             dictionaryTableBody.appendChild(row);
                         });
+
                     })
                     .catch(error => console.error('Ошибка загрузки данных словаря:', error));
             }
         });
+
+
         // Обработчик для кнопки "Галерея картинок"
-        // imageGalleryButton.addEventListener('click', () => {
-        //     const selectedDictionaryId = dictionarySelect.value;
-        //     if (selectedDictionaryId) {
-        //         fetch(`dictionary/${selectedDictionaryId}/images`)
-        //             .then(response => response.json())
-        //             .then(data => {
-        //                 dictionaryTableBody.innerHTML = ''; // Очистка таблицы
-        //                 data.forEach(item => {
-        //                     const row = document.createElement('tr');
-        //                     const wordCell = document.createElement('td');
-        //                     const definitionCell = document.createElement('td');
-        //                     const imageCell = document.createElement('td');
-        //                     const img = document.createElement('img');
-        //                     img.src = item.imageUrl; // Предполагается, что в JSON есть поле imageUrl
-        //                     img.alt = item.word;
-        //                     img.title = item.word;
-        //                     wordCell.textContent = item.word;
-        //                     definitionCell.textContent = item.definition;
-        //                     imageCell.appendChild(img);
-        //                     row.appendChild(wordCell);
-        //                     row.appendChild(definitionCell);
-        //                     row.appendChild(imageCell);
-        //                     dictionaryTableBody.appendChild(row);
-        //                 });
-        //             })
-        //             .catch(error => console.error('Ошибка загрузки изображений:', error));
-        //     }
-        // });
+        imageGalleryButton.addEventListener('click', () => {
+            fetch('/image')
+                .then(response => response.json())
+                .then(image => {
+                    dictionaryTableBody.innerHTML = ''; // Очистка таблицы
+                    // Получаем таблицу
+                    var table = document.getElementById("dictionary-table");
+                    // Добавляем заголовок для новой колонки
+                    var header = table.rows[0].insertCell(-1);
+                    header.outerHTML = "<th>Картинка</th>"; // Устанавливаем заголовок
+                    image.forEach(img => {
+                        const row = document.createElement('tr');
+                        const wordCell = document.createElement('td');
+                        const definitionCell = document.createElement('td');
+                        wordCell.textContent = img.answer;
+                        definitionCell.textContent = img.question;
+                        row.appendChild(wordCell);
+                        row.appendChild(definitionCell);
+                        dictionaryTableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Ошибка загрузки изображений:', error));
+        });
     });
 
     // Функция сортировки таблицы
@@ -197,7 +200,6 @@
 
             return cellA.localeCompare(cellB); // Сравнение по алфавиту
         });
-
         rows.forEach(row => tbody.appendChild(row)); // Перемещение отсортированных строк в tbody
     }
 </script>

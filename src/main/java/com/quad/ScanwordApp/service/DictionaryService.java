@@ -1,9 +1,11 @@
 package com.quad.ScanwordApp.service;
 
 import com.quad.ScanwordApp.exception.NotFoundException;
+import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import com.quad.ScanwordApp.model.Dictionary;
 import com.quad.ScanwordApp.dto.DictionaryDto;
 import com.quad.ScanwordApp.mapper.DictionaryMapper;
+import com.quad.ScanwordApp.model.json.DictionaryData;
 import com.quad.ScanwordApp.repository.DictionaryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -50,5 +52,27 @@ public class DictionaryService {
         dictionaryRepository.deleteById(id);
     }
 
+
+    public void updateDictionary(UUID id, String word, String definition, int operation) {
+        Dictionary dictionary = dictionaryRepository.findById(id).orElse(null);
+        if(dictionary != null){
+            switch (operation) {
+                case 1:{
+                    if(dictionary.getDictionaryData().stream().noneMatch(element -> element.getWord().equals(word))){
+                        dictionary.getDictionaryData().add(DictionaryData.builder()
+                                .word(word)
+                                .definition(definition)
+                                .build());
+                    }
+                    else{
+                        throw new WordAlreadyExistsException("Слово уже есть в словаре");
+                    }
+                }
+                case 2:
+                    dictionary.getDictionaryData().removeIf(item -> item.getWord().equals(word) && item.getDefinition().equals(definition));
+            }
+            dictionaryRepository.save(dictionary);
+        }
+    }
 
 }

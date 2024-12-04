@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -55,4 +56,10 @@ public class DictionaryController {
     public void deleteDictionary(@PathVariable UUID id){
         dictionaryService.deleteDictionary(id);
     }
+
+    @PatchMapping("/{id}")
+    public void updateDictionary(@PathVariable UUID id, @RequestParam String word, @RequestParam String definition, @RequestParam int operation){
+        dictionaryService.updateDictionary(id,word,definition,operation);
+    }
+
 }

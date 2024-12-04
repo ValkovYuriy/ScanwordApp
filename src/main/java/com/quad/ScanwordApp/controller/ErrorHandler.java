@@ -1,6 +1,7 @@
 package com.quad.ScanwordApp.controller;
 
 import com.quad.ScanwordApp.exception.NotFoundException;
+import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +19,14 @@ public class ErrorHandler {
         model.addAttribute("error", e.getMessage());
         return new ModelAndView("error");
     }
+
+    @ExceptionHandler
+    public ModelAndView handleWordAlreadyExistsException(WordAlreadyExistsException e, Model model) {
+        log.error(e.getMessage(),e);
+        model.addAttribute("error", e.getMessage());
+        return new ModelAndView("error");
+    }
+
 
     @ExceptionHandler
     public ModelAndView handleException(Throwable e, Model model) {
