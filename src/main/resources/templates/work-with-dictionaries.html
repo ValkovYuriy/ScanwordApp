@@ -42,6 +42,7 @@
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
+            cursor: pointer;
         }
         #dictionary-table th {
             cursor: pointer;
@@ -110,6 +111,12 @@
         const melodyGalleryButton = document.getElementById('melody-gallery-button');
         const deleteButton = document.getElementById('delete-row');
         const addButton = document.getElementById('add-row');
+        const imageInput = document.createElement('input');
+        const melodyInput = document.createElement('input');
+        imageInput.type = 'file';
+        imageInput.accept = 'image/*';
+        melodyInput.type = 'file';
+        melodyInput.accept = 'audio/*';
         // Загрузка списка словарей
         fetch('/dictionary')
             .then(response => response.json())
@@ -129,11 +136,11 @@
             if (targetRow && targetRow.nodeName === 'TR' && targetRow.rowIndex > 1) { // Проверяем, что это строка
                 // Сбрасываем выделение предыдущей строки
                 if (selectedRow) {
-                    selectedRow.classList.remove('selected');
+                    dictionaryTable.rows[selectedRow.rowIndex].style.backgroundColor = 'white';
                 }
                 // Выделяем новую строчку
                 targetRow.classList.add('selected');
-                targetRow.style.color = 'red';
+                targetRow.style.backgroundColor = 'red';
                 selectedRow = targetRow; // Запоминаем выделенную строку
             }
         });
@@ -189,6 +196,7 @@
 
         // Обработчик для кнопки "Галерея картинок"
         imageGalleryButton.addEventListener('click', () => {
+            selectedRow = null;
             fetch('/image')
                 .then(response => response.json())
                 .then(image => {
@@ -201,6 +209,30 @@
                     // Добавляем заголовок для новой колонки
                     var header = table.rows[0].insertCell(-1);
                     header.outerHTML = "<th>Картинка</th>"; // Устанавливаем заголовок
+
+                    const inputRow = document.createElement('tr');
+                    const inputWord = document.createElement('td');
+                    const inputDefinition = document.createElement('td');
+                    const inputImage = document.createElement('td');
+                    // Создаем элементы input
+                    const wordInput = document.createElement('input');
+                    wordInput.type = 'text';
+                    wordInput.placeholder = 'Введите слово...';
+
+                    const definitionInput = document.createElement('input');
+                    definitionInput.type = 'text';
+                    definitionInput.placeholder = 'Введите определение...';
+
+
+                    // Добавляем input в соответствующие ячейки
+                    inputWord.appendChild(wordInput);
+                    inputDefinition.appendChild(definitionInput);
+                    inputImage.appendChild(imageInput);
+                    // Добавляем ячейки в строку
+                    inputRow.appendChild(inputWord);
+                    inputRow.appendChild(inputDefinition);
+                    inputRow.appendChild(inputImage);
+                    dictionaryTableBody.appendChild(inputRow);
                     image.forEach(img => {
                         const row = document.createElement('tr');
                         const wordCell = document.createElement('td');
@@ -218,12 +250,14 @@
                         row.appendChild(imageCell);
                         dictionaryTableBody.appendChild(row);
                     });
+
                 })
                 .catch(error => console.error('Ошибка загрузки изображений:', error));
         });
 
         // Обработчик для кнопки "Галерея мелодий"
         melodyGalleryButton.addEventListener('click',() => {
+            selectedRow = null;
             fetch('/melody')
                 .then(response => response.json())
                 .then(melodies => {
@@ -236,6 +270,30 @@
                     }
                     var header = table.rows[0].insertCell(-1);
                     header.outerHTML = "<th>Мелодия</th>"; // Устанавливаем заголовок
+
+                    const inputRow = document.createElement('tr');
+                    const inputWord = document.createElement('td');
+                    const inputDefinition = document.createElement('td');
+                    const inputMelody = document.createElement('td');
+                    // Создаем элементы input
+                    const wordInput = document.createElement('input');
+                    wordInput.type = 'text';
+                    wordInput.placeholder = 'Введите слово...';
+
+                    const definitionInput = document.createElement('input');
+                    definitionInput.type = 'text';
+                    definitionInput.placeholder = 'Введите определение...';
+
+
+                    // Добавляем input в соответствующие ячейки
+                    inputWord.appendChild(wordInput);
+                    inputDefinition.appendChild(definitionInput);
+                    inputMelody.appendChild(melodyInput);
+                    // Добавляем ячейки в строку
+                    inputRow.appendChild(inputWord);
+                    inputRow.appendChild(inputDefinition);
+                    inputRow.appendChild(inputMelody);
+                    dictionaryTableBody.appendChild(inputRow);
                     melodies.forEach(melody => {
                         const row = document.createElement('tr');
                         const wordCell = document.createElement('td');
@@ -260,6 +318,41 @@
                     });
                 })
                 .catch(error => console.error('Ошибка загрузки мелодий:', error));
+        });
+
+        imageInput.addEventListener('change', (event) =>{
+            const file = event.target.files[0]; // Получаем первый файл из выбранных
+            const previewImage = document.createElement('img');
+
+            if (file) {
+                const imageURL = URL.createObjectURL(file);
+                previewImage.src = imageURL; // Устанавливаем src в результат
+                previewImage.onload = () => URL.revokeObjectURL(imageURL);
+                previewImage.style.maxWidth = '20%';
+                previewImage.style.maxHeight = '20%';
+                dictionaryTableBody.rows[0].cells[2].innerHTML = '';
+                dictionaryTableBody.rows[0].cells[2].appendChild(previewImage);
+            } else {
+                previewImage.style.display = 'none'; // Скрываем изображение, если файл не выбран
+            }
+        });
+
+        melodyInput.addEventListener('change', (event) => {
+            const file = event.target.files[0]; // Получаем первый файл из выбранных
+            const audioPlayer = document.createElement('audio');
+            if (file) {
+                const reader = new FileReader(); // Создаем экземпляр FileReader
+
+                // Устанавливаем обработчик события onload для FileReader
+                reader.onload = function (event) {
+                    audioPlayer.src = event.target.result; // Устанавливаем источник аудиоплеера на прочитанный файл
+                    //audioPlayer.style.display = 'block'; // Отображаем аудиоплеер
+                    audioPlayer.controls = true;
+                    dictionaryTableBody.rows[0].cells[2].innerHTML = '';
+                    dictionaryTableBody.rows[0].cells[2].appendChild(audioPlayer);
+                };
+                reader.readAsDataURL(file); // Читаем файл как Data URL
+            }
         });
 
         // Обработчик кнопки "Добавить запись в выбранный словарь"
