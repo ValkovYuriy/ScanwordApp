@@ -252,6 +252,7 @@
                         for (let i = 0; i < byteCharacters.length; i++) {
                             byteNumbers[i] = byteCharacters.charCodeAt(i);
                         }
+
                         const audioBlob = new Blob([byteNumbers], { type: 'audio/mpeg' }); // Укажите правильный тип аудио
                         const audioURL = URL.createObjectURL(audioBlob); // Создание URL для аудио
 
