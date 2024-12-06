@@ -1,21 +1,14 @@
 package com.quad.ScanwordApp.controller;
 
 
+import com.quad.ScanwordApp.dto.MelodyDto;
 import com.quad.ScanwordApp.service.MelodyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import com.quad.ScanwordApp.dto.MelodyDto;
+import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -34,7 +27,7 @@ public class MelodyController {
     }
 
     @GetMapping("/{id}")
-    public MelodyDto findMelodyById(@PathVariable UUID id) {
+    public MelodyDto findMelodyById(@PathVariable UUID id) throws IOException {
         MelodyDto melodyDto = melodyService.findMelodyById(id);
         return melodyDto;
     }

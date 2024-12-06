@@ -112,18 +112,17 @@
             })
             .then(images => {
                 const grid = document.getElementById('image-grid');
-
                 images.forEach(image => {
                     const item = document.createElement('div');
                     item.className = 'item';
-
+                    console.debug(image);
                     const img = document.createElement('img');
                     img.src = image.base64Image;
                     img.alt = "Сканворд";
                     img.style.maxWidth = "100%";
 
                     item.prepend(img);
-                    item.innerHTML += `<p>Сканворд: ${image.description}</p>`;
+                    item.innerHTML += `<p>Сканворд: ${image.answer}</p>`;
                     const buttonContainer = document.getElementById('button-container');
                     buttonContainer.style.display = 'flex';
                     buttonContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -141,6 +140,8 @@
                         const selectButton = document.getElementById('select-button');
                         selectButton.hidden = false;
                         selectButton.setAttribute('data-id', image.id);
+
+                        selectButton.scrollIntoView({behavior: 'smooth'});
                     });
 
                     grid.appendChild(item);

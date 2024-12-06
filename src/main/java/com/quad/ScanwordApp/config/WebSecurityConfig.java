@@ -59,7 +59,6 @@ public class WebSecurityConfig
                         .permitAll()
                 )
                 .authenticationProvider(authenticationProvider())
-
         ;
         return http.build();
     }

@@ -60,7 +60,6 @@
             cursor: pointer;
             background-color: #f2f2f2;
         }
-
         .input-row {
             display: flex;
         }
@@ -268,14 +267,21 @@
                         wordCell.textContent = melody.answer;
                         definitionCell.textContent = melody.question;
                         melodyCell.textContent = melody.name;
-                        const audioBlob = new Blob([new Uint8Array(melody.melody)], {type: 'audio/mpeg'}); // Укажите правильный тип audio
-                        const audioURL = URL.createObjectURL(audioBlob);
+                        const base64Melody = melody.melody;
+
+                        // Преобразуем base64 в бинарные данные
+                        const byteCharacters = atob(base64Melody);
+                        const byteNumbers = new Uint8Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+
+                        const audioBlob = new Blob([byteNumbers], { type: 'audio/mpeg' }); // Укажите правильный тип аудио
+                        const audioURL = URL.createObjectURL(audioBlob); // Создание URL для аудио
+
                         const audio = document.createElement('audio');
-                        audio.controls = true; // Включаем элементы управления
+                        audio.controls = true;
                         audio.src = audioURL;
-                        audio.addEventListener('ended', () => {
-                            URL.revokeObjectURL(audio.src);
-                        });
                         melodyCell.appendChild(audio);
                         row.appendChild(wordCell);
                         row.appendChild(definitionCell);
@@ -357,9 +363,6 @@
                 alert('Пожалуйста, выберите запись для удаления');
             }
         });
-        helpButton.addEventListener('click', () => {
-            fetch('/help')
-        })
     });
 
     // Функция сортировки таблицы
