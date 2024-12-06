@@ -10,13 +10,21 @@
             margin: 0;
             padding: 0;
         }
+
         .header {
             background-color: #d4a017;
             color: white;
-            padding: 10px;
-            text-align: center;
-            position: relative;
+            display: flex;
+            justify-content: space-between; /* Размещает элементы по краям */
+            align-items: center; /* Выравнивает элементы по вертикали */
+            padding: 10px; /* Добавляет отступы */
         }
+
+        .title {
+            flex-grow: 1; /* Позволяет заголовку занимать доступное пространство */
+            text-align: center; /* Центрирует текст заголовка */
+        }
+
         .header button {
             position: absolute;
             right: 10px;
@@ -26,39 +34,48 @@
             cursor: pointer;
             font-size: 18px;
         }
+
         .container {
             display: flex;
             padding: 20px;
         }
+
         .table-container {
             flex: 2;
             margin-right: 20px;
         }
+
         #dictionary-table {
             width: 100%;
             border-collapse: collapse;
         }
+
         #dictionary-table th, #dictionary-table td {
             border: 1px solid #ccc;
             padding: 8px;
             text-align: center;
         }
+
         #dictionary-table th {
             cursor: pointer;
             background-color: #f2f2f2;
         }
+
         .input-row {
             display: flex;
         }
+
         .input-row input {
             flex: 1;
             padding: 8px;
             margin-top: 5px;
             border: 1px solid #ccc;
         }
+
         .controls {
             flex: 1;
         }
+
         .controls select, .controls button {
             width: 100%;
             padding: 10px;
@@ -66,12 +83,18 @@
             border: 1px solid #ccc;
             cursor: pointer;
         }
+
+        .help {
+            margin-left: auto;
+        }
     </style>
 </head>
 <body>
 <div class="header">
-    Работа со словарями
-    <button>?</button>
+    <div class="title">Работа со словарями</div>
+    <div class="help"><a href="/help"
+                         style="text-decoration: none;background-color: white;display:inline-block;width: 19px;height: 19px;text-align: center ">?</a>
+    </div>
 </div>
 
 <div class="container">
@@ -110,6 +133,7 @@
         const melodyGalleryButton = document.getElementById('melody-gallery-button');
         const deleteButton = document.getElementById('delete-row');
         const addButton = document.getElementById('add-row');
+        const helpButton = document.getElementById('help-button');
         // Загрузка списка словарей
         fetch('/dictionary')
             .then(response => response.json())
@@ -148,7 +172,7 @@
                         dictionaryId = selectedDictionaryId;
                         dictionaryTableBody.innerHTML = ''; // Очистка таблицы
                         var table = document.getElementById("dictionary-table");
-                        if(table.rows[0].cells.length === 3){
+                        if (table.rows[0].cells.length === 3) {
                             table.rows[0].deleteCell(-1);
                         }
                         const inputRow = document.createElement('tr');
@@ -195,7 +219,7 @@
                     dictionaryTableBody.innerHTML = ''; // Очистка таблицы
                     // Получаем таблицу
                     var table = document.getElementById("dictionary-table");
-                    if(table.rows[0].cells.length === 3){
+                    if (table.rows[0].cells.length === 3) {
                         table.rows[0].deleteCell(-1);
                     }
                     // Добавляем заголовок для новой колонки
@@ -223,7 +247,7 @@
         });
 
         // Обработчик для кнопки "Галерея мелодий"
-        melodyGalleryButton.addEventListener('click',() => {
+        melodyGalleryButton.addEventListener('click', () => {
             fetch('/melody')
                 .then(response => response.json())
                 .then(melodies => {
@@ -231,7 +255,7 @@
                     // Получаем таблицу
                     var table = document.getElementById("dictionary-table");
                     // Добавляем заголовок для новой колонки
-                    if(table.rows[0].cells.length === 3){
+                    if (table.rows[0].cells.length === 3) {
                         table.rows[0].deleteCell(-1);
                     }
                     var header = table.rows[0].insertCell(-1);
@@ -244,7 +268,7 @@
                         wordCell.textContent = melody.answer;
                         definitionCell.textContent = melody.question;
                         melodyCell.textContent = melody.name;
-                        const audioBlob = new Blob([new Uint8Array(melody.melody)], { type: 'audio/mpeg' }); // Укажите правильный тип audio
+                        const audioBlob = new Blob([new Uint8Array(melody.melody)], {type: 'audio/mpeg'}); // Укажите правильный тип audio
                         const audioURL = URL.createObjectURL(audioBlob);
                         const audio = document.createElement('audio');
                         audio.controls = true; // Включаем элементы управления
@@ -333,6 +357,9 @@
                 alert('Пожалуйста, выберите запись для удаления');
             }
         });
+        helpButton.addEventListener('click', () => {
+            fetch('/help')
+        })
     });
 
     // Функция сортировки таблицы
