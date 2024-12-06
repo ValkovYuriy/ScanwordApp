@@ -36,4 +36,7 @@ public class Melody {
 
     @Column(name = "answer",nullable = false)
     private String answer;
+
+    @Column(name = "name",nullable = false)
+    private String name;
 }

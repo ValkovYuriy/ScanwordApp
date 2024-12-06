@@ -59,17 +59,18 @@ public class DictionaryService {
             switch (operation) {
                 case 1:{
                     if(dictionary.getDictionaryData().stream().noneMatch(element -> element.getWord().equals(word))){
-                        dictionary.getDictionaryData().add(DictionaryData.builder()
-                                .word(word)
-                                .definition(definition)
-                                .build());
+                        List<DictionaryData> dictionaryData = dictionary.getDictionaryData();
+                        dictionaryData.add(new DictionaryData(word, definition));
+                        dictionary.setDictionaryData(dictionaryData);
                     }
                     else{
                         throw new WordAlreadyExistsException("Слово уже есть в словаре");
                     }
+                    break;
                 }
                 case 2:
                     dictionary.getDictionaryData().removeIf(item -> item.getWord().equals(word) && item.getDefinition().equals(definition));
+                    break;
             }
             dictionaryRepository.save(dictionary);
         }

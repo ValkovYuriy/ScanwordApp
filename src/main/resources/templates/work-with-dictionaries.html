@@ -94,16 +94,22 @@
         </select>
         <button id="melody-gallery-button">Галерея мелодий</button>
         <button id="image-gallery-button">Галерея картинок</button>
-        <button>Удалить запись из выбранного словаря</button>
-        <button>Добавить запись в выбранный словарь</button>
+        <button id="delete-row">Удалить запись из выбранного словаря</button>
+        <button id="add-row">Добавить запись в выбранный словарь</button>
     </div>
 </div>
 <script>
+    let dictionaryId;
+    let selectedRow;
+
     document.addEventListener('DOMContentLoaded', () => {
         const dictionarySelect = document.getElementById('dictionary-select');
         const dictionaryTableBody = document.getElementById('dictionary-table').querySelector('tbody');
+        const dictionaryTable = document.getElementById('dictionary-table');
         const imageGalleryButton = document.getElementById('image-gallery-button');
-        const melodyGalleryButton = document.getElementById('image-gallery-button');
+        const melodyGalleryButton = document.getElementById('melody-gallery-button');
+        const deleteButton = document.getElementById('delete-row');
+        const addButton = document.getElementById('add-row');
         // Загрузка списка словарей
         fetch('/dictionary')
             .then(response => response.json())
@@ -117,6 +123,20 @@
             })
             .catch(error => console.error('Ошибка загрузки словарей:', error));
 
+        // Обработчик клика по строкам таблицы
+        dictionaryTable.addEventListener('click', (event) => {
+            const targetRow = event.target.closest('tr'); // Найдем родительскую строку, на которую нажали
+            if (targetRow && targetRow.nodeName === 'TR' && targetRow.rowIndex > 1) { // Проверяем, что это строка
+                // Сбрасываем выделение предыдущей строки
+                if (selectedRow) {
+                    selectedRow.classList.remove('selected');
+                }
+                // Выделяем новую строчку
+                targetRow.classList.add('selected');
+                targetRow.style.color = 'red';
+                selectedRow = targetRow; // Запоминаем выделенную строку
+            }
+        });
 
         // Обработчик изменения выбора словаря
         dictionarySelect.addEventListener('change', () => {
@@ -125,7 +145,12 @@
                 fetch(`/dictionary/${selectedDictionaryId}`)
                     .then(response => response.json())
                     .then(data => {
+                        dictionaryId = selectedDictionaryId;
                         dictionaryTableBody.innerHTML = ''; // Очистка таблицы
+                        var table = document.getElementById("dictionary-table");
+                        if(table.rows[0].cells.length === 3){
+                            table.rows[0].deleteCell(-1);
+                        }
                         const inputRow = document.createElement('tr');
                         const inputWord = document.createElement('td');
                         const inputDefinition = document.createElement('td');
@@ -170,6 +195,9 @@
                     dictionaryTableBody.innerHTML = ''; // Очистка таблицы
                     // Получаем таблицу
                     var table = document.getElementById("dictionary-table");
+                    if(table.rows[0].cells.length === 3){
+                        table.rows[0].deleteCell(-1);
+                    }
                     // Добавляем заголовок для новой колонки
                     var header = table.rows[0].insertCell(-1);
                     header.outerHTML = "<th>Картинка</th>"; // Устанавливаем заголовок
@@ -177,14 +205,133 @@
                         const row = document.createElement('tr');
                         const wordCell = document.createElement('td');
                         const definitionCell = document.createElement('td');
+                        const imageCell = document.createElement('td');
+                        const imageElement = document.createElement('img');
+                        imageElement.src = img.base64Image;
+                        imageElement.style.maxWidth = "20%";
+                        imageElement.style.maxHeight = '20%';
+                        imageCell.appendChild(imageElement);
                         wordCell.textContent = img.answer;
                         definitionCell.textContent = img.question;
                         row.appendChild(wordCell);
                         row.appendChild(definitionCell);
+                        row.appendChild(imageCell);
                         dictionaryTableBody.appendChild(row);
                     });
                 })
                 .catch(error => console.error('Ошибка загрузки изображений:', error));
+        });
+
+        // Обработчик для кнопки "Галерея мелодий"
+        melodyGalleryButton.addEventListener('click',() => {
+            fetch('/melody')
+                .then(response => response.json())
+                .then(melodies => {
+                    dictionaryTableBody.innerHTML = ''; // Очистка таблицы
+                    // Получаем таблицу
+                    var table = document.getElementById("dictionary-table");
+                    // Добавляем заголовок для новой колонки
+                    if(table.rows[0].cells.length === 3){
+                        table.rows[0].deleteCell(-1);
+                    }
+                    var header = table.rows[0].insertCell(-1);
+                    header.outerHTML = "<th>Мелодия</th>"; // Устанавливаем заголовок
+                    melodies.forEach(melody => {
+                        const row = document.createElement('tr');
+                        const wordCell = document.createElement('td');
+                        const definitionCell = document.createElement('td');
+                        const melodyCell = document.createElement('td');
+                        wordCell.textContent = melody.answer;
+                        definitionCell.textContent = melody.question;
+                        melodyCell.textContent = melody.name;
+                        const audioBlob = new Blob([new Uint8Array(melody.melody)], { type: 'audio/mpeg' }); // Укажите правильный тип audio
+                        const audioURL = URL.createObjectURL(audioBlob);
+                        const audio = document.createElement('audio');
+                        audio.controls = true; // Включаем элементы управления
+                        audio.src = audioURL;
+                        audio.addEventListener('ended', () => {
+                            URL.revokeObjectURL(audio.src);
+                        });
+                        melodyCell.appendChild(audio);
+                        row.appendChild(wordCell);
+                        row.appendChild(definitionCell);
+                        row.appendChild(melodyCell);
+                        dictionaryTableBody.appendChild(row);
+                    });
+                })
+                .catch(error => console.error('Ошибка загрузки мелодий:', error));
+        });
+
+        // Обработчик кнопки "Добавить запись в выбранный словарь"
+        addButton.addEventListener('click', () => {
+            const rows = dictionaryTableBody.querySelectorAll('tr');
+            rows.forEach(row => {
+                const inputs = row.querySelectorAll('input');
+                if (inputs.length === 2) {
+                    const word = inputs[0].value.trim();
+                    const definition = inputs[1].value.trim();
+                    // Проверяем, что оба поля не пустые
+                    if (word && definition && dictionaryId) {
+                        // Отправляем данные на сервер
+                        fetch(`/dictionary/${dictionaryId}?operation=1&word=${word}&definition=${definition}`, { // Замените на ваш эндпоинт
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded'
+                            },
+                        })
+                            .then(response => {
+                                if (response.ok) {
+                                    // Успешно добавлено
+                                    console.log('Данные успешно добавлены');
+                                    // Очистка полей ввода
+                                    inputs[0].value = '';
+                                    inputs[1].value = '';
+                                    const row = document.createElement('tr');
+                                    const wordCell = document.createElement('td');
+                                    const definitionCell = document.createElement('td');
+                                    wordCell.textContent = word;
+                                    definitionCell.textContent = definition;
+                                    row.appendChild(wordCell);
+                                    row.appendChild(definitionCell);
+                                    dictionaryTable.appendChild(row);
+                                } else {
+                                    console.error('Ошибка при добавлении данных');
+                                }
+                            })
+                            .catch(error => console.error('Ошибка сети:', error));
+                    } else {
+                        alert('Пожалуйста, заполните все поля');
+                    }
+                }
+            });
+        });
+
+        // Обработчик кнопки "Удалить запись из выбранного словаря"
+        deleteButton.addEventListener('click', () => {
+            if (selectedRow) {
+                const word = selectedRow.cells[0].textContent; // Получаем слово из первой ячейки
+                const definition = selectedRow.cells[1].textContent; // Получаем определение из второй ячейки
+
+                fetch(`/dictionary/${dictionaryId}?word=${word}&definition=${definition}&operation=2`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Запись успешно удалена');
+                            // Удалим строку из визуального представления (опционально)
+                            dictionaryTable.removeChild(selectedRow);
+                            selectedRow = null; // Сбрасываем выделение
+                        } else {
+                            console.error('Ошибка при удалении записи');
+                        }
+                    })
+                    .catch(error => console.error('Ошибка сети:', error));
+            } else {
+                alert('Пожалуйста, выберите запись для удаления');
+            }
         });
     });
 

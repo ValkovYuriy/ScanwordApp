@@ -22,4 +22,7 @@ public class MelodyDto {
 
     @NotBlank
     private String answer;
+
+    @NotBlank
+    private String name;
 }
