@@ -4,91 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Работа со словарями</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-        }
-
-        .header {
-            background-color: #d4a017;
-            color: white;
-            display: flex;
-            justify-content: space-between; /* Размещает элементы по краям */
-            align-items: center; /* Выравнивает элементы по вертикали */
-            padding: 10px; /* Добавляет отступы */
-        }
-
-        .title {
-            flex-grow: 1; /* Позволяет заголовку занимать доступное пространство */
-            text-align: center; /* Центрирует текст заголовка */
-        }
-
-        .header button {
-            position: absolute;
-            right: 10px;
-            top: 10px;
-            background-color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-
-        .container {
-            display: flex;
-            padding: 20px;
-        }
-
-        .table-container {
-            flex: 2;
-            margin-right: 20px;
-        }
-
-        #dictionary-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        #dictionary-table th, #dictionary-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-            cursor: pointer;
-        }
-
-        #dictionary-table th {
-            cursor: pointer;
-            background-color: #f2f2f2;
-        }
-
-        .input-row {
-            display: flex;
-        }
-
-        .input-row input {
-            flex: 1;
-            padding: 8px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-        }
-
-        .controls {
-            flex: 1;
-        }
-
-        .controls select, .controls button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #ccc;
-            cursor: pointer;
-        }
-
-        .help {
-            margin-left: auto;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/work-with-dictionaries.css">
 </head>
 <body>
 <!-- Блок для отображения ошибки -->
@@ -96,12 +12,10 @@
     <p th:text="${errorMessage}"></p>
 </div>
 
-<div class="header">
+<header>
     <div class="title">Работа со словарями</div>
-    <div class="help"><a href="/help"
-                         style="text-decoration: none;background-color: white;display:inline-block;width: 19px;height: 19px;text-align: center ">?</a>
-    </div>
-</div>
+    <a href="/help" class="help">?</a>
+</header>
 
 <div class="container">
     <div class="table-container">
@@ -121,10 +35,11 @@
         <select id="dictionary-select">
             <option>Словарь понятий...</option>
         </select>
-        <button id="melody-gallery-button">Галерея мелодий</button>
-        <button id="image-gallery-button">Галерея картинок</button>
-        <button id="delete-row">Удалить запись</button>
-        <button id="add-row">Добавить запись</button>
+
+        <button id="melody-gallery-button" class="main-button">Галерея мелодий</button>
+        <button id="image-gallery-button" class="main-button">Галерея картинок</button>
+        <button id="delete-row" class="main-button">Удалить запись</button>
+        <button id="add-row" class="main-button">Добавить запись</button>
     </div>
 </div>
 <script>
@@ -379,7 +294,7 @@
                 previewImage.onload = () => URL.revokeObjectURL(imageURL);
                 previewImage.style.maxWidth = '20%';
                 previewImage.style.maxHeight = '20%';
-                if(dictionaryTableBody.rows[0].cells[2].children.length >= 2){
+                if (dictionaryTableBody.rows[0].cells[2].children.length >= 2) {
                     const img = dictionaryTableBody.rows[0].cells[2].lastChild;
                     dictionaryTableBody.rows[0].cells[2].removeChild(img);
                 }
@@ -399,7 +314,7 @@
                 reader.onload = function (event) {
                     audioPlayer.src = event.target.result; // Устанавливаем источник аудиоплеера на прочитанный файл
                     audioPlayer.controls = true;
-                    if(dictionaryTableBody.rows[0].cells[2].children.length >= 3){
+                    if (dictionaryTableBody.rows[0].cells[2].children.length >= 3) {
                         const player = dictionaryTableBody.rows[0].cells[2].lastChild;
                         dictionaryTableBody.rows[0].cells[2].removeChild(player);
                     }
@@ -457,7 +372,7 @@
                         fetch('/image', {
                             method: 'POST',
                             body: formData
-                        }) .then(response => {
+                        }).then(response => {
                             if (response.ok) {
                                 // Успешно добавлено
                                 console.log('Данные успешно добавлены');
@@ -497,13 +412,13 @@
                 } else if (word && definition && isMelody) {
                     const name = inputs[2].value.trim();
                     const file = melodyInput.files[0];
-                    if(file && name){
+                    if (file && name) {
                         const formData = new FormData(); // Создаем новый объект FormData
                         formData.append('audio', file); // Добавляем изображение в FormData
                         formData.append('question', definition); // Добавляем вопрос
                         formData.append('answer', word); // Добавляем ответ
                         formData.append('name', name);
-                        fetch('/melody',{
+                        fetch('/melody', {
                             method: 'POST',
                             body: formData
                         }).then(response => {
@@ -550,8 +465,7 @@
                             }
                         })
                             .catch(error => console.error('Ошибка сети:', error));
-                    }
-                    else {
+                    } else {
                         console.error('Файл не выбран!');
                     }
                     isMelody = false;
@@ -568,7 +482,6 @@
             if (selectedRow) {
                 const word = selectedRow.cells[0].textContent; // Получаем слово из первой ячейки
                 const definition = selectedRow.cells[1].textContent; // Получаем определение из второй ячейки
-                const name = selectedRow.cells[2].textContent;
                 if (dictionaryId != null) {
                     fetch(`/dictionary/${dictionaryId}?word=${word}&definition=${definition}&operation=2`, {
                         method: 'PATCH',
@@ -587,8 +500,8 @@
                             }
                         })
                         .catch(error => console.error('Ошибка сети:', error));
-                } else if(dictionaryTableBody.querySelectorAll('input').length === 3){
-                    fetch(`image/${word}`,{
+                } else if (dictionaryTableBody.querySelectorAll('input').length === 3) {
+                    fetch(`image/${word}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
@@ -603,9 +516,9 @@
                             }
                         })
                         .catch(error => console.error('Ошибка сети:', error));
-                }
-                else {
-                    fetch(`/melody/${name}`,{
+                } else {
+                    const name = selectedRow.cells[2].textContent;
+                    fetch(`/melody/${name}`, {
                         method: 'DELETE'
                     })
                         .then(response => {

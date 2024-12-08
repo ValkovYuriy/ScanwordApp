@@ -1,0 +1,115 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #d4a017;
+    color: white;
+    display: flex;
+    justify-content: space-between; /* Размещает элементы по краям */
+    align-items: center; /* Выравнивает элементы по вертикали */
+    padding: 10px; /* Добавляет отступы */
+}
+
+.title {
+    flex-grow: 1; /* Позволяет заголовку занимать доступное пространство */
+    text-align: center; /* Центрирует текст заголовка */
+}
+
+.help {
+    margin-left: auto;
+    text-decoration: none;
+    background-color: white;
+    display: inline-block;
+    width: 19px;
+    height: 19px;
+    text-align: center
+}
+
+header .help:hover {
+    background-color: #eeeeee;
+}
+
+.container {
+    display: flex;
+    padding: 20px;
+    max-width: 1220px;
+    margin: 0 auto;
+}
+
+.table-container {
+    flex: 2;
+    margin-right: 20px;
+    max-width: 1000px;
+}
+
+#dictionary-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#dictionary-table th, #dictionary-table td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: center;
+    cursor: pointer;
+}
+
+#dictionary-table td img:hover{
+    transform: scale(3);
+}
+
+#dictionary-table th {
+    cursor: pointer;
+    background-color: #f2f2f2;
+}
+
+.input-row {
+    display: flex;
+}
+
+.input-row input {
+    flex: 1;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+}
+
+.controls {
+    flex: 1;
+    max-width: 200px;
+}
+
+.main-button {
+    margin:20px auto;
+    color: #FFFFFF;
+    display: block;
+    font:bold 16px arial;
+    height: 35px;
+    line-height: 35px;
+    text-align: center;
+    text-decoration: none;
+    width: 160px;
+    background: linear-gradient(to bottom, #209DCA, #0F84AF) repeat scroll 0 0 / 100% 200% rgba(0, 0, 0, 0);
+    transition: all 0.5s linear 0s;
+    border-bottom: 4px solid #ccc;
+}
+
+.main-button:hover, .main-button:focus {
+    background-position: 0 -102%;
+}
+
+.controls select {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background-color: white;
+}
+
+.controls select:hover, .controls button:hover {
+    background-color: #eeeeee;
+}
