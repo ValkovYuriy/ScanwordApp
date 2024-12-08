@@ -19,6 +19,18 @@ public class ScanwordService {
 
     private final ScanwordMapper scanwordMapper;
 
+    public boolean createScanword(ScanwordDto scanwordDto) {
+        Scanword scanword = scanwordMapper.toScanword(scanwordDto);
+        if(scanwordRepository.existsById(scanword.getId())) {
+            return false;
+        }
+        else
+        {
+            scanwordRepository.save(scanword);
+            return true;
+        }
+    }
+
     public List<ScanwordDto> findAllScanwords() {
         return scanwordRepository.findAll()
                 .stream()

@@ -62,7 +62,7 @@
 <body>
 <div class="form-container">
     <h2>Создание сканворда</h2>
-    <form id="crosswordForm">
+    <form id="scanwordForm">
         <div class="form-group">
             <label for="name">Название сканворда:</label>
             <input type="text" id="name" value="Новый 1" required minlength="4" maxlength="20">
@@ -91,6 +91,20 @@
 </div>
 
 <script>
+
+    document.getElementById("scanwordForm").addEventListener("submit", function(event) {
+        event.preventDefault();
+
+        // Сохранение введенных данных в localStorage
+        localStorage.setItem('scanwordName', document.getElementById('name').value);
+        localStorage.setItem('scanwordWidth', document.getElementById('x').value);
+        localStorage.setItem('scanwordHeight', document.getElementById('y').value);
+        localStorage.setItem('hintsCount', document.getElementById('hints').value);
+        localStorage.setItem('dictionaryId', document.getElementById('dictionary').value);
+
+        // Переход на страницу создания сканворда
+        window.location.href = 'scanword-creation';
+    });
     document.addEventListener("DOMContentLoaded", function() {
         // Функция для подгрузки словарей
         function loadDictionaries() {
@@ -107,7 +121,6 @@
                 })
                 .catch(error => console.error('Ошибка при загрузке словарей:', error));
         }
-
         // Вызываем функцию для загрузки словарей
         loadDictionaries();
     });

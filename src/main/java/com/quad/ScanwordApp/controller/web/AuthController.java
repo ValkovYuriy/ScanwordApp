@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Objects;
+
 @RequiredArgsConstructor
 @Controller
 public class AuthController
@@ -24,8 +26,14 @@ public class AuthController
         if (auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken)) {
             model.addAttribute("isAuthenticated", true);
             model.addAttribute("username", auth.getName());
-            model.addAttribute("isAdmin", auth.getAuthorities().stream()
-                    .anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN")));
+            if(Objects.equals(auth.getName(), "admin"))
+            {
+                model.addAttribute("isAdmin", true);
+            }
+            else
+            {
+                model.addAttribute("isUser", true);
+            }
         } else {
             model.addAttribute("isAuthenticated", false);
         }

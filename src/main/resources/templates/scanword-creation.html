@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание сканворда</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        .form-body {
+            display: flex;
+            flex-direction: row; /* Изменение на row для размещения кнопок и сетки рядом */
+            align-items: flex-start; /* Выравнивание по верхнему краю */
+            justify-content: left; /* Центрирование по горизонтали */
+            flex-grow: 1; /* Эти параметры позволяют компонентам занимать доступное пространство */
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 20px;
+            margin-right: 20px;
+        }
+        .grid {
+            display: grid;
+            gap: 1px;
+            margin-left: 20px; /* Отступ от кнопок */
+            margin-top: 20px; /* Отступ сверху */
+            justify-self: center; /* Центрирование сетки в её контейнере */
+        }
+        .cell {
+            border: 1px solid #ccc;
+            width: 40px;
+            height: 40px;
+            background-color: white;
+            transition: background-color 0.2s ease; /* Плавный переход цвета */
+        }
+        .preview-highlight {
+            background-color: rgba(0, 0, 255, 0.5);
+        }
+        .highlight {
+            background-color: blue;
+        }
+        .answer-preview:hover {
+            background-color: rgba(255, 0, 0, 0.5);
+        }
+        .answer-final {
+            background-color: red;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 3px;
+            background-color: #4caf50;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        button.back {
+            background-color: #f44336;
+        }
+        button.back:hover {
+            background-color: #e53935;
+        }
+    </style>
+</head>
+<body>
+<div class="form-container">
+    <h2>Создание сканворда</h2>
+    <div class="form-body">
+        <div class="controls">
+            <button onclick="addWord()">Добавить</button>
+            <button onclick="saveScanword()">Сохранить</button>
+            <button class="back" onclick="goBack()">Назад</button>
+        </div>
+        <div id="scanwordGrid" class="grid">
+
+        </div>
+    </div>
+</div>
+
+<script>
+    const scanwordName = localStorage.getItem('scanwordName');
+    const width = +localStorage.getItem('scanwordWidth');
+    const height = +localStorage.getItem('scanwordHeight');
+    const maxLineLength = 5;
+    const minLineLength = 2;
+
+    let isMouseDown = false;
+    let startCell = null;
+    let selectedCells = [];
+    let answerPreviewCells = [];
+    let lastFinalCells = [];
+
+    document.addEventListener('DOMContentLoaded', function () {
+        createGrid(width, height);
+        document.title = `Сканворд: ${scanwordName}`;
+
+        document.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('keydown', handleKeyDown);
+    });
+
+    function createGrid(cols, rows) {
+        const grid = document.getElementById('scanwordGrid');
+        grid.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
+        grid.style.gridTemplateRows = `repeat(${rows}, 40px)`;
+        grid.innerHTML = '';
+
+        for (let i = 0; i < rows; i++) {
+            for (let j = 0; j < cols; j++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.dataset.row = i;
+                cell.dataset.col = j;
+                grid.appendChild(cell);
+            }
+        }
+    }
+
+    function saveScanword() {
+        alert('Сканворд сохранен!');
+    }
+
+    function addWord() {
+        alert('Добавление слова!');
+    }
+
+    function goBack() {
+        window.history.back();
+    }
+
+    function handleMouseDown(event) {
+        const cell = event.target.closest('.cell');
+        if (!cell) return;
+
+        if (!cell.classList.contains('answer-final') && !cell.classList.contains('answer-preview')) {
+            lastFinalCells = [];
+            isMouseDown = true;
+            startCell = cell;
+            selectedCells = [cell];  // Начинаем с выделенной ячейки
+            highlightPreview(selectedCells);
+        }
+    }
+
+    function handleMouseMove(event) {
+        if (!isMouseDown) return;
+
+        const cell = event.target.closest('.cell');
+        if (!cell) return;
+
+        const rowStart = parseInt(startCell.dataset.row);
+        const colStart = parseInt(startCell.dataset.col);
+        const rowCurrent = parseInt(cell.dataset.row);
+        const colCurrent = parseInt(cell.dataset.col);
+
+        let newCellsToHighlight = [];
+
+        if (rowStart === rowCurrent) { // Горизонтальное выделение
+            newCellsToHighlight = highlightCells(rowStart, colStart, colCurrent);
+        } else if (colStart === colCurrent) { // Вертикальное выделение
+            newCellsToHighlight = highlightCells(colCurrent, rowStart, rowCurrent, true);
+        }
+
+        // Убираем выделение из ранее выделенных ячеек, если они больше не в новой выборке
+        selectedCells.forEach(cell => {
+            if (!newCellsToHighlight.includes(cell)) {
+                cell.classList.remove('preview-highlight');
+                selectedCells.pop();
+            }
+        });
+
+        // Добавляем новые выделенные ячейки
+        newCellsToHighlight.forEach(cell => {
+            if (!selectedCells.includes(cell)) {
+                selectedCells.push(cell);
+                cell.classList.add('preview-highlight');
+            }
+        });
+    }
+
+    function highlightCells(fixed, start, end, isVertical = false) {
+        let cellsToHighlight = [];
+        for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
+            let cell = isVertical
+                ? document.querySelector(`[data-row="${i}"][data-col="${fixed}"]`)
+                : document.querySelector(`[data-row="${fixed}"][data-col="${i}"]`);
+            if (!cell.classList.contains('answer-final') && !cell.classList.contains('answer-preview')) {
+                cellsToHighlight.push(cell);
+            } else {
+                break; // Остановка выделения, если ячейка занята
+            }
+        }
+        return cellsToHighlight.length <= maxLineLength ? cellsToHighlight : [];
+    }
+
+    function clearPreview() {
+        const highlightedCells = document.querySelectorAll('.preview-highlight');
+        highlightedCells.forEach(cell => cell.classList.remove('preview-highlight'));
+        answerPreviewCells.forEach(cell => {
+            cell.classList.remove('answer-preview');
+        });
+    }
+
+    function highlightPreview(cells) {
+        cells.forEach(cell => {
+            if (!cell.classList.contains('highlight')) {
+                cell.classList.add('preview-highlight'); // Добавляем выделение
+            }
+        });
+    }
+
+    function handleMouseUp() {
+        if (!isMouseDown) return;
+        isMouseDown = false;
+
+        // Проверка на длину выделенной линии
+        if (selectedCells.length >= minLineLength && selectedCells.length <= maxLineLength) {
+            selectedCells.forEach(cell => {
+                cell.classList.remove('preview-highlight');
+                cell.classList.add('highlight');
+            });
+            readyForAnswerPreview();
+        } else {
+            clearPreview();
+            selectedCells = [];
+        }
+    }
+
+    function readyForAnswerPreview() {
+        const startRow = parseInt(startCell.dataset.row);
+        const startCol = parseInt(startCell.dataset.col);
+
+        // Отображаем клетки answer-preview вокруг начальной клетки и диагонально
+        for (let i = -1; i <= 1; i++) {
+            for (let j = -1; j <= 1; j++) {
+                if (Math.abs(i) + Math.abs(j) === 1 || (i !== 0 && j !== 0)) { // Проверяем направления и диагонали
+                    const neighborCell = document.querySelector(`[data-row="${startRow + i}"][data-col="${startCol + j}"]`);
+                    if (neighborCell && !neighborCell.classList.contains('highlight') && !neighborCell.classList.contains('answer-final')) {
+                        neighborCell.classList.add('answer-preview');
+                        answerPreviewCells.push(neighborCell);
+                    }
+                }
+            }
+        }
+    }
+
+    function handleKeyDown(event) {
+        if (event.key === 'Escape') {
+            removeLastFinalCell();
+            clearAllSelections();
+        }
+    }
+
+    function clearAllSelections() {
+        clearPreview();
+        answerPreviewCells.forEach(cell => {
+            cell.classList.remove('answer-preview');
+        });
+
+        selectedCells.forEach(cell => {
+            cell.classList.remove('highlight');
+        });
+
+        selectedCells = [];
+        answerPreviewCells = [];
+        startCell = null;
+    }
+
+    function removeLastFinalCell() {
+        if (lastFinalCells.length > 0) {
+            const lastCell = lastFinalCells.pop();
+            lastCell.classList.remove('answer-final');
+        }
+    }
+
+    // Обработка повторного нажатия по пустым клеткам answer-preview
+    document.getElementById('scanwordGrid').addEventListener('click', (event) => {
+        const cell = event.target.closest('.cell');
+        if (!cell) return;
+
+        if (cell.classList.contains('answer-preview')) {
+            cell.classList.add('answer-final');
+            lastFinalCells.push(cell);
+            clearPreview(); // Возврат к пункту 1 без сброса
+        }
+    });
+</script>
+</body>
+</html>

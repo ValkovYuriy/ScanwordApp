@@ -60,7 +60,29 @@
     </style>
 </head>
 <body>
-<div th:if="${isAuthenticated}">
+<div th:if="${isAdmin}">
+    <div class="container mt-5 index-body">
+        <div class="card authenticated">
+            <div class="card-body">
+                <div class="card-header">
+                    <h2 class="card-title">Hello there, <span th:text="${username}"!></span></h2>
+                </div>
+                <div class="user-buttons-container authenticated-body">
+                    <div class="mt-4 button">
+                        <a href="/input-parameters" class="btn btn-primary btn-user">Начать создание нового сканворда</a>
+                    </div>
+                    <div class="mt-4 button">
+                        <a href="/continue-creating" class="btn btn-primary btn-user">Продолжить создание сканворда</a>
+                    </div>
+                </div>
+            </div>
+            <div class="logout-button">
+                <a href="/logout" class="btn btn-secondary">Выйти из системы</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:if="${isUser}">
     <div class="container mt-5 index-body">
         <div class="card authenticated">
             <div class="card-body">
@@ -82,15 +104,6 @@
         </div>
     </div>
 </div>
-
-<div th:if="${isAdmin}">
-    <div class="container mt-5">
-        <div class="card">
-
-        </div>
-    </div>
-</div>
-
 <div th:if="${!isAuthenticated}">
     <div class="container mt-5">
         <div class="card">
