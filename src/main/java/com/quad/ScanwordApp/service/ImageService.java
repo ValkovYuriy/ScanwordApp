@@ -51,4 +51,8 @@ public class ImageService {
     public void deleteImage(UUID id) {
         imageRepository.deleteById(id);
     }
+
+    public void deleteImageByAnswer(String answer) {
+        imageRepository.deleteImageByAnswer(answer);
+    }
 }

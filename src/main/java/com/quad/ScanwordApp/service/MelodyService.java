@@ -48,4 +48,8 @@ public class MelodyService {
     public void deleteMelody(UUID id) {
         melodyRepository.deleteById(id);
     }
+
+    public void deleteMelodyByName(String name) {
+        melodyRepository.deleteByName(name);
+    }
 }

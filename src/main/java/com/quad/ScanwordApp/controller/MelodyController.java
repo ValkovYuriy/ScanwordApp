@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,9 +34,17 @@ public class MelodyController {
     }
 
     @PostMapping
-    public MelodyDto addMelody(@RequestBody @Valid MelodyDto melodyDto) {
-        MelodyDto melodyDto1 = melodyService.addMelody(melodyDto);
-        return melodyDto1;
+    public MelodyDto addMelody(@RequestParam("audio") MultipartFile melody,
+                               @RequestParam("question") String question,
+                               @RequestParam("answer") String answer,
+                               @RequestParam("name") String name) throws IOException {
+
+        MelodyDto melodyDto = new MelodyDto();
+        melodyDto.setQuestion(question);
+        melodyDto.setAnswer(answer);
+        melodyDto.setMelody(melody.getBytes());
+        melodyDto.setName(name);
+        return melodyService.addMelody(melodyDto);
     }
 
     @PutMapping
@@ -44,8 +53,13 @@ public class MelodyController {
         return melodyDto1;
     }
 
-    @DeleteMapping("/{id}")
-    public void deleteMelody(@PathVariable UUID id) {
-        melodyService.deleteMelody(id);
+//    @DeleteMapping("/{id}")
+//    public void deleteMelody(@PathVariable UUID id) {
+//        melodyService.deleteMelody(id);
+//    }
+
+    @DeleteMapping("/{name}")
+    public void deleteMelodyByName(@PathVariable String name)  {
+        melodyService.deleteMelodyByName(name);
     }
 }
