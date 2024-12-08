@@ -97,6 +97,11 @@ header .help:hover {
     border-bottom: 4px solid #ccc;
 }
 
+.error-message {
+    color: red;
+    display: none;
+}
+
 .main-button:hover, .main-button:focus {
     background-position: 0 -102%;
 }

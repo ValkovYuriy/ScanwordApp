@@ -33,8 +33,8 @@
         </select>
         <button id="melody-gallery-button" class="main-button">Галерея мелодий</button>
         <button id="image-gallery-button" class="main-button">Галерея картинок</button>
-        <button id="delete-row">Удалить запись</button>
-        <button id="add-row">Добавить запись</button>
+        <button id="delete-row" class="main-button">Удалить запись</button>
+        <button id="add-row" class="main-button">Добавить запись</button>
         <div id="error" class="error-message">Сообщение об ошибке</div>
 
     </div>
@@ -109,10 +109,13 @@
                         const wordInput = document.createElement('input');
                         wordInput.type = 'text';
                         wordInput.placeholder = 'Введите слово...';
+                        wordInput.style.textAlign = 'center';
 
                         const definitionInput = document.createElement('input');
                         definitionInput.type = 'text';
                         definitionInput.placeholder = 'Введите определение...';
+                        definitionInput.style.width= '98%';
+                        definitionInput.style.textAlign = 'center';
 
                         // Добавляем input в соответствующие ячейки
                         inputWord.appendChild(wordInput);
