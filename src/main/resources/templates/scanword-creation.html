@@ -183,9 +183,9 @@
 
         let newCellsToHighlight = [];
 
-        if (rowStart === rowCurrent) { // Горизонтальное выделение
+        if (rowStart === rowCurrent && colStart <= colCurrent) { // Горизонтальное выделение
             newCellsToHighlight = highlightCells(rowStart, colStart, colCurrent);
-        } else if (colStart === colCurrent) { // Вертикальное выделение
+        } else if (colStart === colCurrent && rowStart <= rowCurrent) { // Вертикальное выделение
             newCellsToHighlight = highlightCells(colCurrent, rowStart, rowCurrent, true);
         }
 

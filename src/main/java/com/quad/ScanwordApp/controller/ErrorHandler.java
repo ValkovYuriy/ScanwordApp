@@ -28,10 +28,18 @@ public class ErrorHandler {
         return new ModelAndView("error");
     }
 
+//    @ExceptionHandler(MaxUploadSizeExceededException.class)
+//    public ResponseEntity<ErrorResponse> handleMaxSizeException(MaxUploadSizeExceededException e, Model model) {
+//        log.error(e.getMessage(), e);
+//        model.addAttribute("error", e.getMessage());
+//        return ResponseEntity.ok(new ErrorResponse("ОК", e.getMessage()));
+//    }
+
     @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public String handleMaxSizeException(MaxUploadSizeExceededException exc, Model model) {
-        model.addAttribute("errorMessage", "Ошибка: Файл слишком большой! Пожалуйста, выберите файл меньшего размера.");
-        return "work-with-dictionaries";  // Имя вашей HTML-страницы
+    public ModelAndView handleMaxSizeException(MaxUploadSizeExceededException exc) {
+        ModelAndView modelAndView = new ModelAndView("work-with-dictionaries");
+        modelAndView.addObject("errorMessage", "Размер файла превышает допустимый лимит!");
+        return modelAndView;
     }
 
 //    @ExceptionHandler

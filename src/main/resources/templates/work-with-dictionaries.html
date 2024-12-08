@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en" >
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -56,16 +56,14 @@
             text-align: center;
             cursor: pointer;
         }
-
         #dictionary-table th {
             cursor: pointer;
             background-color: #f2f2f2;
         }
-
-        .input-row {
-            display: flex;
+        .error-message {
+            color: red;
+            display: none;
         }
-
         .input-row input {
             flex: 1;
             padding: 8px;
@@ -91,10 +89,6 @@
     </style>
 </head>
 <body>
-<!-- Блок для отображения ошибки -->
-<div th:if="${errorMessage}" class="error">
-    <p th:text="${errorMessage}"></p>
-</div>
 
 <div class="header">
     <div class="title">Работа со словарями</div>
@@ -125,8 +119,12 @@
         <button id="image-gallery-button">Галерея картинок</button>
         <button id="delete-row">Удалить запись</button>
         <button id="add-row">Добавить запись</button>
+        <div id="error" class="error-message">Сообщение об ошибке</div>
+
     </div>
 </div>
+
+
 <script>
     let dictionaryId;
     let selectedRow;
@@ -141,6 +139,7 @@
         const melodyGalleryButton = document.getElementById('melody-gallery-button');
         const deleteButton = document.getElementById('delete-row');
         const addButton = document.getElementById('add-row');
+        const message = document.getElementById('error');
         const imageInput = document.createElement('input');
         const melodyInput = document.createElement('input');
         imageInput.type = 'file';
@@ -178,6 +177,7 @@
         // Обработчик изменения выбора словаря
         dictionarySelect.addEventListener('change', () => {
             const selectedDictionaryId = dictionarySelect.value;
+            message.style.display = 'none';
             if (selectedDictionaryId) {
                 fetch(`/dictionary/${selectedDictionaryId}`)
                     .then(response => response.json())
@@ -229,6 +229,8 @@
             selectedRow = null;
             dictionaryId = null;
             isMelody = false;
+            imageInput.value = "";
+            message.style.display = 'none';
             fetch('/image')
                 .then(response => response.json())
                 .then(image => {
@@ -292,6 +294,8 @@
             selectedRow = null;
             dictionaryId = null;
             isImage = false;
+            melodyInput.value = "";
+            message.style.display = 'none';
             fetch('/melody')
                 .then(response => response.json())
                 .then(melodies => {
@@ -372,7 +376,7 @@
         imageInput.addEventListener('change', (event) => {
             const file = event.target.files[0]; // Получаем первый файл из выбранных
             const previewImage = document.createElement('img');
-
+            message.style.display = 'none';
             if (file) {
                 const imageURL = URL.createObjectURL(file);
                 previewImage.src = imageURL; // Устанавливаем src в результат
@@ -393,6 +397,7 @@
         melodyInput.addEventListener('change', (event) => {
             const file = event.target.files[0]; // Получаем первый файл из выбранных
             const audioPlayer = document.createElement('audio');
+            message.style.display = 'none';
             if (file) {
                 const reader = new FileReader(); // Создаем экземпляр FileReader
                 // Устанавливаем обработчик события onload для FileReader
@@ -414,6 +419,7 @@
         addButton.addEventListener('click', () => {
             const row = dictionaryTableBody.rows[0];
             const inputs = row.querySelectorAll('input');
+            const maxSizeInBytes = 1024 * 1024; // 1 МБ в байтах
             if (inputs.length >= 2) {
                 const word = inputs[0].value.trim();
                 const definition = inputs[1].value.trim();
@@ -450,46 +456,58 @@
                 } else if (word && definition && isImage) {
                     const file = imageInput.files[0];
                     if (file) {
-                        const formData = new FormData(); // Создаем новый объект FormData
-                        formData.append('image', file); // Добавляем изображение в FormData
-                        formData.append('question', definition); // Добавляем вопрос
-                        formData.append('answer', word); // Добавляем ответ
-                        fetch('/image', {
-                            method: 'POST',
-                            body: formData
-                        }) .then(response => {
-                            if (response.ok) {
-                                // Успешно добавлено
-                                console.log('Данные успешно добавлены');
-                                // Очистка полей ввода
-                                inputs[0].value = '';
-                                inputs[1].value = '';
-                                imageInput.value = "";
-                                dictionaryTableBody.rows[0].cells[2].innerHTML = '';
-                                dictionaryTableBody.rows[0].cells[2].appendChild(imageInput);
-                                const row = document.createElement('tr');
-                                const wordCell = document.createElement('td');
-                                const definitionCell = document.createElement('td');
-                                const imageCell = document.createElement('td');
-                                const imageElement = document.createElement('img');
-                                const imageURL = URL.createObjectURL(file);
-                                imageElement.src = imageURL; // Устанавливаем src в результат
-                                imageElement.onload = () => URL.revokeObjectURL(imageURL);
-                                imageElement.style.maxWidth = '20%';
-                                imageElement.style.maxHeight = '20%';
-                                imageCell.appendChild(imageElement);
-                                wordCell.textContent = word;
-                                definitionCell.textContent = definition;
-                                row.appendChild(wordCell);
-                                row.appendChild(definitionCell);
-                                row.appendChild(imageCell);
-                                dictionaryTableBody.appendChild(row);
-                                sortTable(0);
-                            } else {
-                                console.error('Ошибка при добавлении данных');
-                            }
-                        })
-                            .catch(error => console.error('Ошибка сети:', error));
+                        if(file.size > maxSizeInBytes){
+                            const message = document.getElementById('error');
+                            message.textContent = 'Размер изображения не должени превышать 1 МБ';
+                            message.style.display = 'block';
+                            inputs[0].value = '';
+                            inputs[1].value = '';
+                            imageInput.value = "";
+                            dictionaryTableBody.rows[0].cells[2].innerHTML = '';
+                            dictionaryTableBody.rows[0].cells[2].appendChild(imageInput);
+                        }
+                        else {
+                            const formData = new FormData(); // Создаем новый объект FormData
+                            formData.append('image', file); // Добавляем изображение в FormData
+                            formData.append('question', definition); // Добавляем вопрос
+                            formData.append('answer', word); // Добавляем ответ
+                            fetch('/image', {
+                                method: 'POST',
+                                body: formData
+                            }).then(response => {
+                                if (response.ok) {
+                                    // Успешно добавлено
+                                    console.log('Данные успешно добавлены');
+                                    // Очистка полей ввода
+                                    inputs[0].value = '';
+                                    inputs[1].value = '';
+                                    imageInput.value = "";
+                                    dictionaryTableBody.rows[0].cells[2].innerHTML = '';
+                                    dictionaryTableBody.rows[0].cells[2].appendChild(imageInput);
+                                    const row = document.createElement('tr');
+                                    const wordCell = document.createElement('td');
+                                    const definitionCell = document.createElement('td');
+                                    const imageCell = document.createElement('td');
+                                    const imageElement = document.createElement('img');
+                                    const imageURL = URL.createObjectURL(file);
+                                    imageElement.src = imageURL; // Устанавливаем src в результат
+                                    imageElement.onload = () => URL.revokeObjectURL(imageURL);
+                                    imageElement.style.maxWidth = '20%';
+                                    imageElement.style.maxHeight = '20%';
+                                    imageCell.appendChild(imageElement);
+                                    wordCell.textContent = word;
+                                    definitionCell.textContent = definition;
+                                    row.appendChild(wordCell);
+                                    row.appendChild(definitionCell);
+                                    row.appendChild(imageCell);
+                                    dictionaryTableBody.appendChild(row);
+                                    sortTable(0);
+                                } else {
+                                    console.error('Ошибка при добавлении данных');
+                                }
+                            })
+                                .catch(error => console.error('Ошибка сети:', error));
+                        }
                     } else {
                         console.error('Файл не выбран!');
                     }
@@ -498,58 +516,76 @@
                     const name = inputs[2].value.trim();
                     const file = melodyInput.files[0];
                     if(file && name){
-                        const formData = new FormData(); // Создаем новый объект FormData
-                        formData.append('audio', file); // Добавляем изображение в FormData
-                        formData.append('question', definition); // Добавляем вопрос
-                        formData.append('answer', word); // Добавляем ответ
-                        formData.append('name', name);
-                        fetch('/melody',{
-                            method: 'POST',
-                            body: formData
-                        }).then(response => {
-                            if (response.ok) {
-                                const reader = new FileReader();
-                                // Успешно добавлено
-                                console.log('Данные успешно добавлены');
-                                // Очистка полей ввода
-                                inputs[0].value = '';
-                                inputs[1].value = '';
-                                inputs[2].value = '';
-                                melodyInput.value = "";
-                                dictionaryTableBody.rows[0].cells[2].innerHTML = '';
-                                const nameInput = document.createElement('input');
-                                nameInput.type = 'text';
-                                nameInput.placeholder = 'Введите имя композитора и название мелодии... ';
-                                nameInput.style.width = (nameInput.placeholder.length + 1) * 8 + 'px';
-                                dictionaryTableBody.rows[0].cells[2].appendChild(nameInput);
-                                dictionaryTableBody.rows[0].cells[2].appendChild(melodyInput);
-                                const row = document.createElement('tr');
-                                const wordCell = document.createElement('td');
-                                const definitionCell = document.createElement('td');
-                                const melodyCell = document.createElement('td');
-                                const melodyElement = document.createElement('audio');
-                                reader.onload = function (event) {
-                                    melodyElement.src = event.target.result; // Устанавливаем источник аудиоплеера на прочитанный файл
-                                    melodyElement.controls = true;
-                                };
-                                reader.readAsDataURL(file); // Читаем файл как Data URL
-                                const titleElement = document.createElement('div');
-                                titleElement.textContent = name;
-                                titleElement.style.marginBottom = '8px';
-                                melodyCell.appendChild(titleElement);
-                                melodyCell.appendChild(melodyElement);
-                                wordCell.textContent = word;
-                                definitionCell.textContent = definition;
-                                row.appendChild(wordCell);
-                                row.appendChild(definitionCell);
-                                row.appendChild(melodyCell);
-                                dictionaryTableBody.appendChild(row);
-                                sortTable(0);
-                            } else {
-                                console.error('Ошибка при добавлении данных');
-                            }
-                        })
-                            .catch(error => console.error('Ошибка сети:', error));
+                        if(file.size > maxSizeInBytes){
+                            const message = document.getElementById('error');
+                            message.textContent = 'Размер мелодии не должени превышать 1 МБ';
+                            message.style.display = 'block';
+                            inputs[0].value = '';
+                            inputs[1].value = '';
+                            inputs[2].value = '';
+                            melodyInput.value = "";
+                            dictionaryTableBody.rows[0].cells[2].innerHTML = '';
+                            const nameInput = document.createElement('input');
+                            nameInput.type = 'text';
+                            nameInput.placeholder = 'Введите имя композитора и название мелодии... ';
+                            nameInput.style.width = (nameInput.placeholder.length + 1) * 8 + 'px';
+                            dictionaryTableBody.rows[0].cells[2].appendChild(nameInput);
+                            dictionaryTableBody.rows[0].cells[2].appendChild(melodyInput);
+                        }
+                        else {
+                            const formData = new FormData(); // Создаем новый объект FormData
+                            formData.append('audio', file); // Добавляем изображение в FormData
+                            formData.append('question', definition); // Добавляем вопрос
+                            formData.append('answer', word); // Добавляем ответ
+                            formData.append('name', name);
+                            fetch('/melody', {
+                                method: 'POST',
+                                body: formData
+                            }).then(response => {
+                                if (response.ok) {
+                                    const reader = new FileReader();
+                                    // Успешно добавлено
+                                    console.log('Данные успешно добавлены');
+                                    // Очистка полей ввода
+                                    inputs[0].value = '';
+                                    inputs[1].value = '';
+                                    inputs[2].value = '';
+                                    melodyInput.value = "";
+                                    dictionaryTableBody.rows[0].cells[2].innerHTML = '';
+                                    const nameInput = document.createElement('input');
+                                    nameInput.type = 'text';
+                                    nameInput.placeholder = 'Введите имя композитора и название мелодии... ';
+                                    nameInput.style.width = (nameInput.placeholder.length + 1) * 8 + 'px';
+                                    dictionaryTableBody.rows[0].cells[2].appendChild(nameInput);
+                                    dictionaryTableBody.rows[0].cells[2].appendChild(melodyInput);
+                                    const row = document.createElement('tr');
+                                    const wordCell = document.createElement('td');
+                                    const definitionCell = document.createElement('td');
+                                    const melodyCell = document.createElement('td');
+                                    const melodyElement = document.createElement('audio');
+                                    reader.onload = function (event) {
+                                        melodyElement.src = event.target.result; // Устанавливаем источник аудиоплеера на прочитанный файл
+                                        melodyElement.controls = true;
+                                    };
+                                    reader.readAsDataURL(file); // Читаем файл как Data URL
+                                    const titleElement = document.createElement('div');
+                                    titleElement.textContent = name;
+                                    titleElement.style.marginBottom = '8px';
+                                    melodyCell.appendChild(titleElement);
+                                    melodyCell.appendChild(melodyElement);
+                                    wordCell.textContent = word;
+                                    definitionCell.textContent = definition;
+                                    row.appendChild(wordCell);
+                                    row.appendChild(definitionCell);
+                                    row.appendChild(melodyCell);
+                                    dictionaryTableBody.appendChild(row);
+                                    sortTable(0);
+                                } else {
+                                    console.error('Ошибка при добавлении данных');
+                                }
+                            })
+                                .catch(error => console.error('Ошибка сети:', error));
+                        }
                     }
                     else {
                         console.error('Файл не выбран!');
@@ -568,7 +604,6 @@
             if (selectedRow) {
                 const word = selectedRow.cells[0].textContent; // Получаем слово из первой ячейки
                 const definition = selectedRow.cells[1].textContent; // Получаем определение из второй ячейки
-                const name = selectedRow.cells[2].textContent;
                 if (dictionaryId != null) {
                     fetch(`/dictionary/${dictionaryId}?word=${word}&definition=${definition}&operation=2`, {
                         method: 'PATCH',
@@ -605,6 +640,7 @@
                         .catch(error => console.error('Ошибка сети:', error));
                 }
                 else {
+                    const name = selectedRow.cells[2].textContent;
                     fetch(`/melody/${name}`,{
                         method: 'DELETE'
                     })

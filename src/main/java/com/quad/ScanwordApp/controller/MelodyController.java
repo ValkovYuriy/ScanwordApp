@@ -6,7 +6,15 @@ import com.quad.ScanwordApp.service.MelodyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -28,16 +36,16 @@ public class MelodyController {
     }
 
     @GetMapping("/{id}")
-    public MelodyDto findMelodyById(@PathVariable UUID id) throws IOException {
+    public MelodyDto findMelodyById(@PathVariable UUID id)  {
         MelodyDto melodyDto = melodyService.findMelodyById(id);
         return melodyDto;
     }
 
     @PostMapping
     public MelodyDto addMelody(@RequestParam("audio") MultipartFile melody,
-                               @RequestParam("question") String question,
-                               @RequestParam("answer") String answer,
-                               @RequestParam("name") String name) throws IOException {
+                                  @RequestParam("question") String question,
+                                  @RequestParam("answer") String answer,
+                                  @RequestParam("name") String name) throws IOException {
 
         MelodyDto melodyDto = new MelodyDto();
         melodyDto.setQuestion(question);
