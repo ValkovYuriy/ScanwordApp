@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #d4a017;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+}
+
+.container {
+    max-width: 480px;
+    margin: 0 auto;
+}
+.main-content {
+    font-family: "Times New Roman", sans-serif;
+    font-size: 18px;
+    padding-top: 20px;
+    text-align: center;
+}
+
+pre {
+    font-family: 'Times New Roman'
+}
+
+.samara {
+    padding-top: 30px;
+    color: gray
+}
