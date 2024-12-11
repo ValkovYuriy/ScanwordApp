@@ -9,6 +9,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ScanwordAppApplication {
 
 	public static void main(String[] args)  {
-		 SpringApplication.run(ScanwordAppApplication.class, args);
+		SpringApplication.run(ScanwordAppApplication.class, args);
 	}
 }

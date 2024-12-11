@@ -6,10 +6,8 @@ import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.ModelAndView;
 
 
 @ControllerAdvice
@@ -17,10 +15,9 @@ import org.springframework.web.servlet.ModelAndView;
 public class ErrorHandler {
 
     @ExceptionHandler
-    public ModelAndView handleNotFoundException(NotFoundException e, Model model) {
+    public ResponseEntity<ResponseDto<Object>> handleNotFoundException(NotFoundException e) {
         log.error(e.getMessage(), e);
-        model.addAttribute("error", e.getMessage());
-        return new ModelAndView("error");
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ResponseDto<>(e.getMessage(),null));
     }
 
     @ExceptionHandler
@@ -29,12 +26,6 @@ public class ErrorHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseDto<>(e.getMessage(),null));
     }
 
-
-//    @ExceptionHandler
-//    public ResponseEntity<ResponseDto<Object>> handleDataIntegrityViolationException(DataIntegrityViolationException e) {
-//        log.error(e.getMessage(), e);
-//        return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseDto<>("Ответ должен"))
-//    }
 
     @ExceptionHandler
     public ResponseEntity<ResponseDto<Object>> handleException(Throwable e) {
