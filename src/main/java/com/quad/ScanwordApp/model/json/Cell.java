@@ -21,9 +21,11 @@ public class Cell {
 
     private char letter;
 
-    private boolean isTask;
+    private boolean task;
 
     private TaskType taskType;
 
     private UUID taskId;
+
+    private String word;
 }
