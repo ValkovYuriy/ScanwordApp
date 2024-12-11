@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,11 +18,13 @@ public class Cell {
 
     private int col;
 
-    private char letter;
+    private Character letter;
 
     private boolean isTask;
 
     private TaskType taskType;
 
     private UUID taskId;
+
+    private String word;
 }
