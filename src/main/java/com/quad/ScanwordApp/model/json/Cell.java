@@ -20,7 +20,7 @@ public class Cell {
 
     private Character letter;
 
-    private boolean isTask;
+    private boolean task;
 
     private TaskType taskType;
 
