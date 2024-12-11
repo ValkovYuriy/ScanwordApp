@@ -2,6 +2,7 @@ package com.quad.ScanwordApp.service;
 
 import com.quad.ScanwordApp.dto.MelodyDto;
 import com.quad.ScanwordApp.exception.NotFoundException;
+import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import com.quad.ScanwordApp.mapper.MelodyMapper;
 import com.quad.ScanwordApp.model.Melody;
 import com.quad.ScanwordApp.repository.MelodyRepository;
@@ -33,6 +34,10 @@ public class MelodyService {
     }
 
     public MelodyDto addMelody(MelodyDto melodyDto) {
+        List<Melody> melodyList = melodyRepository.findAll();
+        if(melodyList.stream().anyMatch(melody -> melody.getAnswer().equalsIgnoreCase(melodyDto.getAnswer()))) {
+            throw new WordAlreadyExistsException("Ответ " + melodyDto.getAnswer() + " уже существует");
+        }
         Melody melody = melodyMapper.toMelody(melodyDto);
         return melodyMapper.toDto(melodyRepository.save(melody));
     }
@@ -49,7 +54,7 @@ public class MelodyService {
         melodyRepository.deleteById(id);
     }
 
-    public void deleteMelodyByName(String name) {
-        melodyRepository.deleteByName(name);
+    public void deleteMelodyByName(String answer) {
+        melodyRepository.deleteByAnswer(answer);
     }
 }

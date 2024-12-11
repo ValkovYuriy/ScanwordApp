@@ -15,6 +15,6 @@ public interface MelodyRepository extends JpaRepository<Melody, UUID> {
 
     @Modifying
     @Transactional
-    @Query("DELETE FROM Melody m WHERE m.name = :name")
-    void deleteByName(@Param("name") String name);
+    @Query("DELETE FROM Melody m WHERE m.answer = :answer")
+    void deleteByAnswer(@Param("answer") String answer);
 }

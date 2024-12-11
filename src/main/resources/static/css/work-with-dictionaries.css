@@ -99,7 +99,7 @@ header .help:hover {
 
 .error-message {
     color: red;
-    display: none;
+    display: block;
 }
 
 .main-button:hover, .main-button:focus {

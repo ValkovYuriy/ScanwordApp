@@ -1,9 +1,11 @@
 package com.quad.ScanwordApp.controller;
 
 import com.quad.ScanwordApp.dto.ImageDto;
+import com.quad.ScanwordApp.dto.ResponseDto;
 import com.quad.ScanwordApp.service.ImageService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,15 +50,16 @@ public class ImageController {
     }
 
     @PostMapping
-    public ImageDto addImage(@RequestParam("image") MultipartFile image,
-                             @RequestParam("question") String question,
-                             @RequestParam("answer") String answer) throws IOException {
+    public ResponseEntity<ResponseDto<ImageDto>> addImage(@RequestParam("image") MultipartFile image,
+                                                        @RequestParam("question") String question,
+                                                        @RequestParam("answer") String answer) throws IOException {
         // Создаем новый ImageDto
         ImageDto imageDto = new ImageDto();
         imageDto.setImage(image.getBytes()); // Получаем массив байтов из файла
         imageDto.setQuestion(question);
         imageDto.setAnswer(answer);
-        return imageService.addImage(imageDto);
+        ImageDto result = imageService.addImage(imageDto);
+        return ResponseEntity.ok(new ResponseDto<>("",result));
     }
 
     @PutMapping
