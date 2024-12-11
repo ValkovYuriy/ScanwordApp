@@ -22,9 +22,8 @@ public class CreateController
     private final CreateScanwordService createScanwordService;
 
     @GetMapping
-    public ResponseEntity<ResponseDto<FilteredData>> getFilteredData(@RequestParam Integer length, @RequestParam String regex, @RequestParam UUID dictionaryId){
-        ResponseDto<FilteredData> response = new ResponseDto<>("success",createScanwordService.getFilteredData(length,regex,dictionaryId));
+    public ResponseEntity<ResponseDto<FilteredData>> getFilteredData(@RequestParam Integer length, @RequestParam String regex, @RequestParam String dictionaryId){
+        ResponseDto<FilteredData> response = new ResponseDto<>("success",createScanwordService.getFilteredData(length,regex, UUID.fromString(dictionaryId)));
         return ResponseEntity.ok(response);
     }
-
 }

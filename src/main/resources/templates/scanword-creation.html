@@ -57,10 +57,11 @@
 
         .cell {
             border: 1px solid #ccc;
-            width: 40px;
-            height: 40px;
+            width: 25px;
+            height: 25px;
             background-color: white;
             transition: background-color 0.2s ease; /* Плавный переход цвета */
+            text-align: center;
         }
 
         .preview-highlight {
@@ -78,33 +79,18 @@
         .answer-final {
             background-color: red;
         }
-
-        /*button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border: none;
-            border-radius: 3px;
-            background-color: #4caf50;
-            color: white;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        button:hover {
-            background-color: #45a049;
-        }
-
-        button.back {
-            background-color: #f44336;
-        }
-
-        button.back:hover {
-            background-color: #e53935;
-        }*/
         .controls button {
             margin-bottom: 5px;
+        }
+        .delete-highlight {
+            outline: 2px solid red; /* Красная рамка для выделения */
+        }
+        .item-type, .item-answer{
+            cursor: pointer;
+        }
+        .texted
+        {
+            background-color: white;
         }
     </style>
 </head>
@@ -115,10 +101,16 @@
         <div class="controls">
             <button onclick="addWord()">Добавить</button>
             <button onclick="saveScanword()">Сохранить</button>
+            <button class="back" onclick="enableDelete()">Удалить слово</button>
             <button class="back" onclick="goBack()">Назад</button>
         </div>
         <div id="scanwordGrid" class="grid">
 
+        </div>
+        <div class="word-container">
+            <div class="word-list" id="wordList">
+                <!-- Слова будут добавлены здесь динамически -->
+            </div>
         </div>
     </div>
 </div>
@@ -136,6 +128,9 @@
     let answerPreviewCells = [];
     let lastFinalCells = [];
     let answerAdded = true;
+    let deleteMode = false;
+    let currentID = 1;
+    let choosen = true;
 
     document.addEventListener('DOMContentLoaded', function () {
         createGrid(width, height);
@@ -149,8 +144,8 @@
 
     function createGrid(cols, rows) {
         const grid = document.getElementById('scanwordGrid');
-        grid.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
-        grid.style.gridTemplateRows = `repeat(${rows}, 40px)`;
+        grid.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
+        grid.style.gridTemplateRows = `repeat(${rows}, 25px)`;
         grid.innerHTML = '';
 
         for (let i = 0; i < rows; i++) {
@@ -175,13 +170,21 @@
     function goBack() {
         window.history.back();
     }
+    function enableDelete() {
+        deleteMode = !deleteMode; // Переключаем режим удаления
+        alert(deleteMode ? 'Режим удаления включен. Нажмите на клетки для их удаления.' : 'Режим удаления отключен.');
+    }
 
     function handleMouseDown(event) {
         const cell = event.target.closest('.cell');
         if (!cell) return;
-
-        if (!cell.classList.contains('answer-final') && !cell.classList.contains('answer-preview') && answerAdded) {
+        if (deleteMode) {
+            selectForDelete(cell);
+            return;
+        }
+        if (!cell.classList.contains('answer-final') && !cell.classList.contains('answer-preview') && choosen && answerAdded) {
             answerAdded = false;
+            choosen = false;
             lastFinalCells = [];
             isMouseDown = true;
             startCell = cell;
@@ -192,8 +195,8 @@
 
     function handleMouseMove(event) {
         if (!isMouseDown) return;
-
         const cell = event.target.closest('.cell');
+
         if (!cell) return;
 
         const rowStart = parseInt(startCell.dataset.row);
@@ -226,6 +229,29 @@
         });
     }
 
+    function selectForDelete(cell) {
+        const cellClasses = Array.from(cell.classList).filter(cls => cls.startsWith('id-'));
+        if (cellClasses.length > 0) {
+            const cellIdToRemove = cellClasses[0]; // Извлекаем первый класс как идентификатор
+
+            // Находим все клетки с тем же id
+            const allCellsToRemove = document.querySelectorAll(`.cell.${cellIdToRemove}`);
+
+            allCellsToRemove.forEach(c => {
+                c.classList.remove(cellIdToRemove); // Убираем только id
+                // Удаляем 'answer-final' и 'highlight' только если у клетки 1 id
+                if (c.classList.length === 2) {
+                    c.classList.remove('answer-final');
+                    c.textContent = "";
+                }
+                if(c.classList.length === 3){
+                    c.classList.remove('highlight', "texted");
+                    c.textContent = "";
+                }
+            });
+        }
+    }
+
     function highlightCells(fixed, start, end, isVertical = false) {
         let cellsToHighlight = [];
         for (let i = Math.min(start, end); i <= Math.max(start, end); i++) {
@@ -235,7 +261,7 @@
             if (!cell.classList.contains('answer-final') && !cell.classList.contains('answer-preview')) {
                 cellsToHighlight.push(cell);
             } else {
-                break; // Остановка выделения, если ячейка занята
+                break;
             }
         }
         return cellsToHighlight.length <= maxLineLength ? cellsToHighlight : [];
@@ -247,6 +273,8 @@
         answerPreviewCells.forEach(cell => {
             cell.classList.remove('answer-preview');
         });
+        answerAdded = true;
+        choosen = true;
     }
 
     function highlightPreview(cells) {
@@ -266,6 +294,7 @@
             selectedCells.forEach(cell => {
                 cell.classList.remove('preview-highlight');
                 cell.classList.add('highlight');
+                cell.classList.add(`id-${currentID}`);
             });
             readyForAnswerPreview();
         } else {
@@ -301,14 +330,11 @@
 
     function clearAllSelections() {
         clearPreview();
-        answerPreviewCells.forEach(cell => {
-            cell.classList.remove('answer-preview');
-        });
-
+        if(startCell != null)
+            selectForDelete(startCell);
         selectedCells.forEach(cell => {
-            cell.classList.remove('highlight');
-        });
-
+            cell.classList.remove("highlight");
+        })
         selectedCells = [];
         answerPreviewCells = [];
         startCell = null;
@@ -318,6 +344,7 @@
         if (lastFinalCells.length > 0) {
             const lastCell = lastFinalCells.pop();
             lastCell.classList.remove('answer-final');
+            lastCell.textContent = "";
         }
     }
 
@@ -329,10 +356,179 @@
         if (cell.classList.contains('answer-preview')) {
             answerAdded = true;
             cell.classList.add('answer-final');
+            cell.classList.add(`id-${currentID}`);
             lastFinalCells.push(cell);
+            getWords();
+            currentID++;
             clearPreview(); // Возврат к пункту 1 без сброса
         }
     });
+
+    function getWords() {
+        let regex = "";
+        selectedCells.forEach(cell =>{
+            if(cell.textContent === "")
+            {
+                regex += ".";
+            }
+            else
+            {
+                regex += cell.textContent;
+            }
+        });
+        fetch(`/create_api?length=${selectedCells.length}&regex=${regex}&dictionaryId=${localStorage.getItem('dictionaryId')}`) // Замените на ваши параметры
+            .then(response => response.json())
+            .then(data => {
+                console.log("Полученные данные:", data); // Проверяем структуру ответа
+
+                // Проверяем, существует ли data и необходимые ключи
+                if (data && data.data) {
+                    const dictionaryData = data.data.dictionaryData || []; // Извлекаем dictionaryData или пустой массив
+                    const images = data.data.images || []; // Извлекаем images или пустой массив
+                    const melodies = data.data.melodies || []; // Извлекаем melodies или пустой массив
+
+                    // Теперь передаем все данные в displayWords
+                    displayWords(dictionaryData, images, melodies);
+                    console.log("displayWords() отработал.")
+                } else {
+                    console.error("Неверная структура ответа:", data);
+                }
+            })
+            .catch(error => console.error("Ошибка при загрузке слов:", error));
+    }
+
+    function displayWords(dictionaryData, images, melodies) {
+        const wordList = document.getElementById('wordList');
+        wordList.innerHTML = ''; // Очищаем перед загрузкой новых данных
+
+        // Создаем контейнер для списка с прокруткой
+        const container = document.createElement('div');
+        container.style.overflowY = 'scroll';
+        container.style.maxHeight = '300px'; // Высота контейнера с прокруткой
+        container.style.border = '1px solid #ccc'; // Обводка для контейнера
+
+        // Создаем заголовки для сортировки
+        const header = document.createElement('div');
+        header.innerHTML = `
+        <div style="display: flex; justify-content: space-between; cursor: pointer;">
+            <div id="answerHeader" style="flex: 1;"><strong>Ответ</strong></div>
+            <div id="typeHeader" style="flex: 1;"><strong>Тип</strong></div>
+        </div>
+    `;
+
+        const items = []; // Массив для хранения элементов
+
+        // Объединяем данные слов, изображений и мелодий
+        dictionaryData.forEach(item => {
+            items.push({ answer: item.word, definition : item.definition,type: 'text' });
+        });
+
+        images.forEach(img => {
+            items.push({ answer: img.answer.toUpperCase(), imgSrc: img.base64Image, type: 'image'});
+        });
+
+        melodies.forEach(melody => {
+            items.push({ answer: melody.answer.toUpperCase(), name: melody.name, melody64: melody.melody, type: 'audio' });
+        });
+
+        // Переменные для отслеживания направления сортировки
+        let answerSortDirection = true; // true - по возрастанию, false - по убыванию
+        let typeSortDirection = true;
+
+        // Сортировка и отображение
+        const renderItems = (itemsToRender) => {
+            container.innerHTML = ''; // Очищаем контейнер перед рендерингом
+            itemsToRender.forEach(item => {
+                const wordItem = document.createElement('div');
+                wordItem.classList.add('word-item');
+                const icon = item.type === 'text' ? '📄' : item.type === 'image' ? '🖼️' : '🎵';
+
+                wordItem.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="item-answer">${item.answer}</span>
+                    <span class="item-type" >${icon}</span>
+                </div>
+                <div class="item-details" style="display: none;"></div>
+            `;
+
+                // Добавляем обработчик для нажатия на иконку и показываем детали
+                wordItem.querySelector('.item-type').addEventListener('click', () => {
+                    const detailsDiv = wordItem.querySelector('.item-details');
+                    if (item.type === 'text') {
+                        detailsDiv.innerHTML = item.definition; // Показываем текст
+                    } else if (item.type === 'image') {
+                        detailsDiv.innerHTML = `<img src="${item.imgSrc}" alt="${item.answer}" style="max-width: 100px;"/>`; // Показываем изображение
+                    } else if (item.type === 'audio')
+                    {
+                        const base64Melody = item.melody64;
+                        // Преобразуем base64 в бинарные данные
+                        const byteCharacters = atob(base64Melody);
+                        const byteNumbers = new Uint8Array(byteCharacters.length);
+                        for (let i = 0; i < byteCharacters.length; i++) {
+                            byteNumbers[i] = byteCharacters.charCodeAt(i);
+                        }
+                        const audioBlob = new Blob([byteNumbers], {type: 'audio/mpeg'}); // Укажите правильный тип аудио
+                        const audioURL = URL.createObjectURL(audioBlob);
+                        detailsDiv.innerHTML = `
+                        <span>${item.name}</span>
+                        <audio controls>
+                            <source src="${audioURL}" type="audio/mpeg">
+                            Ваш браузер не поддерживает воспроизведение аудио.
+                        </audio>
+                    `;
+                    }
+                    detailsDiv.style.display = detailsDiv.style.display === 'none' ? 'block' : 'none'; // Переключаем видимость
+                });
+                wordItem.querySelector('.item-answer').addEventListener('click', () =>
+                {
+                    let icon = '';
+                    if (item.type === 'text') {
+                        icon = '📄'; // Иконка текста
+                    } else if (item.type === 'image') {
+                        icon = '🖼️'; // Иконка изображения
+                    } else if (item.type === 'audio') {
+                        icon = '🎵'; // Иконка аудио
+                    }
+                    let answerCell = lastFinalCells.pop();
+                    lastFinalCells.push(answerCell);
+                    answerCell.textContent = icon;
+                    const arr = [];
+                    for (let i = 0; i <= selectedCells.length; i++) {
+                        arr.push(item.answer[selectedCells.length - i]);
+                    }
+                    selectedCells.forEach((cell) => {
+                        cell.textContent = arr.pop();
+                        cell.classList.add("texted");
+                    });
+                    choosen = true;
+                });
+                container.appendChild(wordItem);
+            });
+        };
+
+        // Первоначальная сортировка по умолчанию
+        items.sort((a, b) => a.answer.localeCompare(b.answer));
+        renderItems(items);
+
+        // Обработчик клика по заголовкам
+        header.querySelector('#answerHeader').addEventListener('click', () => {
+            items.sort((a, b) => answerSortDirection ? b.answer.localeCompare(a.answer) : a.answer.localeCompare(b.answer));
+            answerSortDirection = !answerSortDirection; // Меняем направление
+            renderItems(items);
+        });
+
+        header.querySelector('#typeHeader').addEventListener('click', () => {
+            items.sort((a, b) => {
+                if (a.type === b.type) return 0;
+                return (typeSortDirection ? a.type.localeCompare(b.type) : b.type.localeCompare(a.type));
+            });
+            typeSortDirection = !typeSortDirection; // Меняем направление
+            renderItems(items);
+        });
+
+        wordList.appendChild(header);
+        wordList.appendChild(container);
+    }
 </script>
 </body>
 </html>
