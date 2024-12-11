@@ -8,87 +8,14 @@
 </head>
 <body>
 
+<header>
+    <div class="title" id="title">Загрузка сканворда...</div>
+    <a href="/help" class="help">?</a>
+</header>
+
 <div id="crosswordContainer"></div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', (event) => {
-        fetch("scanword/9fd2f3cf-a240-4c41-887d-60ea7cdef02e")
-            .then(response => response.json())
-            .then(scanword => {
-                loadScanword(scanword);
-            });
-
-        /*        for(let i = 0; i < m; i++) {
-                    for(let j = 0; j < n; j++) {
-                        const cell = document.createElement('input');
-                        cell.type = 'text';
-                        cell.className = 'cell';
-                        cell.maxLength = 1;
-                        cell.addEventListener('input', function(e) {
-                            if (e.target.value && e.target.value.length > 0) {
-                                // Перемещение фокуса на следующую клетку
-                                let nextCell = crossword.querySelector(`input:nth-child(${i * n + j + 2})`);
-                                if (nextCell && !nextCell.disabled) {
-                                    nextCell.focus();
-                                }
-                            }
-                            e.target.value = e.target.value.toUpperCase();
-                        });
-                        crossword.appendChild(cell);
-                    }
-                }*/
-
-        /* container.appendChild(crossword);
-
-         // Пример: блокировка некоторых клеток (можно адаптировать для реального сканворда)
-         const blockedCells = [0, 6, 12, 18, 24]; // индексы клеток для блокировки
-         blockedCells.forEach(index => {
-             crossword.children[index].disabled = true;
-             crossword.children[index].style.backgroundColor = 'red';
-         });*/
-    });
-
-    function loadScanword(scanword) {
-
-        const container = document.getElementById('crosswordContainer');
-        const crossword = document.createElement('div');
-        const m = scanword.height; // количество строк
-        const n = scanword.width; // количество столбцов
-        let tasks = [m * n];
-        let index = 0;
-        crossword.className = 'crossword';
-        crossword.style.gridTemplateColumns = "repeat(" + n + ", 30px)";
-        scanword.content.forEach(item => {
-            const cell = document.createElement('input');
-            cell.type = 'text';
-            cell.className = 'cell';
-            cell.maxLength = 1;
-            if (!item.task) {
-                cell.value = item.letter;
-            } else
-                tasks[index] = true;
-            cell.addEventListener('input', function (e) {
-                if (e.target.value && e.target.value.length > 0) {
-                    // Перемещение фокуса на следующую клетку
-                    let nextCell = crossword.querySelector(`input:nth-child(${item.row * n + item.col + 2})`);
-                    if (nextCell && !nextCell.disabled) {
-                        nextCell.focus();
-                    }
-                }
-                e.target.value = e.target.value.toUpperCase();
-            });
-            crossword.appendChild(cell);
-            index++;
-        });
-        container.appendChild(crossword);
-        for (let i = 0; i < m * n; i++) {
-            if (tasks[i]) {
-                crossword.children[i].disabled = true;
-                crossword.children[i].style.backgroundColor = 'red';
-            }
-        }
-    }
-</script>
+<script src="/js/solvingScanword.js"></script>
 
 </body>
 </html>

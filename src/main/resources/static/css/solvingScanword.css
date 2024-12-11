@@ -1,13 +1,58 @@
 body {
     font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
 }
-.crossword {
+
+header {
+    background-color: #d4a017;
+    color: white;
+    display: flex;
+    justify-content: space-between; /* Размещает элементы по краям */
+    align-items: center; /* Выравнивает элементы по вертикали */
+    padding: 5px; /* Добавляет отступы */
+}
+
+.title {
+    flex-grow: 1; /* Позволяет заголовку занимать доступное пространство */
+    text-align: center; /* Центрирует текст заголовка */
+}
+
+.help {
+    margin-left: auto;
+    text-decoration: none;
+    background-color: white;
+    display: inline-block;
+    width: 19px;
+    height: 19px;
+    text-align: center
+}
+
+header .help:hover {
+    background-color: #eeeeee;
+}
+
+.scanwordDivElement {
     display: grid;
     grid-template-columns: repeat(9, 30px); /* Предполагая, что m = 10 */
     gap: 1px;
     margin: 20px auto;
     width: fit-content;
 }
+
+.cellWrapper {
+    position: relative; /* Позволяет использовать абсолютное позиционирование для изображения */
+    width: 30px; /* Контейнер ячейки должен соответствовать размеру ячейки */
+    height: 30px; /* Высота совпадает с высотой ячейки */
+}
+
+.cellWrapper img {
+    position: absolute; /* Размещение изображения в ячейке */
+    width: 100%; /* Ширина изображения на 100% от ширины контейнера */
+    height: 100%; /* Высота изображения на 100% от высоты контейнера */
+    object-fit: cover; /* Обеспечивает правильное обрезание изображения */
+}
+
 .cell {
     width: 28px;
     height: 30px;
