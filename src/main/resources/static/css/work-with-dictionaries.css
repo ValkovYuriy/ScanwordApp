@@ -4,6 +4,13 @@ body {
     padding: 0;
 }
 
+.fixed-button-1 {
+    position: fixed;
+    right: 20px;
+    bottom: 50px;
+    width: 180px;
+}
+
 header {
     background-color: #d4a017;
     color: white;
@@ -82,28 +89,14 @@ header .help:hover {
     max-width: 200px;
 }
 
-.main-button {
-    margin:20px auto;
-    color: #FFFFFF;
-    display: block;
-    font:bold 16px arial;
-    height: 35px;
-    line-height: 35px;
-    text-align: center;
-    text-decoration: none;
-    width: 160px;
-    background: linear-gradient(to bottom, #209DCA, #0F84AF) repeat scroll 0 0 / 100% 200% rgba(0, 0, 0, 0);
-    transition: all 0.5s linear 0s;
-    border-bottom: 4px solid #ccc;
+.controls button {
+    width: 200px;
+    margin-bottom: 5px;
 }
 
 .error-message {
     color: red;
     display: block;
-}
-
-.main-button:hover, .main-button:focus {
-    background-position: 0 -102%;
 }
 
 .controls select {

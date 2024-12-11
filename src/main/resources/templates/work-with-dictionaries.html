@@ -1,12 +1,15 @@
 <!DOCTYPE html>
-<html lang="en" >
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Работа со словарями</title>
     <link rel="stylesheet" href="/css/work-with-dictionaries.css">
+    <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+
+<button id="delete-row" class="fixed-button-1">удалить запись</button>
 
 <header>
     <div class="title">Работа со словарями</div>
@@ -31,10 +34,9 @@
         <select id="dictionary-select">
             <option>Словарь понятий...</option>
         </select>
-        <button id="melody-gallery-button" class="main-button">Галерея мелодий</button>
-        <button id="image-gallery-button" class="main-button">Галерея картинок</button>
-        <button id="delete-row" class="main-button">Удалить запись</button>
-        <button id="add-row" class="main-button">Добавить запись</button>
+        <button id="melody-gallery-button">Галерея мелодий</button>
+        <button id="image-gallery-button">Галерея картинок</button>
+        <button id="add-row">добавить запись</button>
         <div id="error" class="error-message"></div>
 
 
@@ -86,10 +88,10 @@
                 targetRow.classList.add('selected');
                 targetRow.style.backgroundColor = 'red';
                 selectedRow = targetRow; // Запоминаем выделенную строку
-                window.scrollTo({
+/*                window.scrollTo({
                     top: 0,
                     behavior: 'smooth' // Плавная прокрутка
-                });
+                });*/
             }
         });
 
@@ -120,7 +122,7 @@
                         const definitionInput = document.createElement('input');
                         definitionInput.type = 'text';
                         definitionInput.placeholder = 'Введите определение...';
-                        definitionInput.style.width= '98%';
+                        definitionInput.style.width = '98%';
                         definitionInput.style.textAlign = 'center';
 
                         // Добавляем input в соответствующие ячейки
@@ -346,19 +348,16 @@
             if (inputs.length >= 2) {
                 const word = inputs[0].value.trim();
                 const definition = inputs[1].value.trim();
-                if(word.length > 10){
+                if (word.length > 10) {
                     message.textContent = 'Длина ответа превышает 10 символов';
                     message.style.display = 'block';
-                }
-                else if (definition.length > 60){
+                } else if (definition.length > 60) {
                     message.textContent = 'Длина определения превышает 60 символов';
                     message.style.display = 'block';
-                }
-                else if(!containsOnlyNonEnglish(word) || !containsOnlyNonEnglish(definition)){
+                } else if (!containsOnlyNonEnglish(word) || !containsOnlyNonEnglish(definition)) {
                     message.textContent = 'Допустимы только символы кириллицы';
                     message.style.display = 'block';
-                }
-                else {
+                } else {
                     // Проверяем, что оба поля не пустые
                     if (word && definition && dictionaryId) {
 
@@ -463,15 +462,13 @@
                         isImage = false;
                     } else if (word && definition && isMelody) {
                         const name = inputs[2].value.trim();
-                        if(name.length > 60){
+                        if (name.length > 60) {
                             message.textContent = 'Длина названия мелодии превышает 60 символов';
                             message.style.display = 'block';
-                        }
-                        else if(!containsOnlyNonEnglish(name)){
+                        } else if (!containsOnlyNonEnglish(name)) {
                             message.textContent = 'Допустимы только символы кириллицы';
                             message.style.display = 'block';
-                        }
-                        else {
+                        } else {
                             const file = melodyInput.files[0];
                             if (file && name) {
                                 if (file.size > maxSizeInBytes) {
@@ -610,9 +607,8 @@
                             }
                         })
                         .catch(error => console.error('Ошибка сети:', error));
-                }
-                else {
-                    fetch(`/melody/${word}`,{
+                } else {
+                    fetch(`/melody/${word}`, {
                         method: 'DELETE'
                     })
                         .then(response => {
