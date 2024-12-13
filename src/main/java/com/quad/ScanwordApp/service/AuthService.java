@@ -4,7 +4,6 @@ import com.quad.ScanwordApp.model.User;
 import com.quad.ScanwordApp.model.enums.Role;
 import com.quad.ScanwordApp.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +14,6 @@ public class AuthService {
 
     private final PasswordEncoder passwordEncoder;
 
-    public boolean login(String username, String password) throws UsernameNotFoundException{
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found!"));
-        System.out.println(user);
-        return user != null && user.getPassword().equals(passwordEncoder.encode(password));
-    }
 
     public boolean register(String username, String password) {
         User user = new User();

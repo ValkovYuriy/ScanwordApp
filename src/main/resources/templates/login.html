@@ -14,15 +14,8 @@
 <body>
 <div class="container mt-5">
     <h1>Вход в систему</h1>
-<!--    <div th:if="${param.error}" class="alert alert-danger">-->
-<!--        Неправильный логин или пароль.-->
-<!--    </div>-->
-    <div th:if="${errorLogin}" class="alert alert-danger">
-        Неправильный логин.
-    </div>
-
-    <div th:if="${errorPassword}" class="alert alert-danger">
-        Неправильный пароль.
+    <div th:if="${param.error}" class="alert alert-danger">
+        Неправильный логин или пароль.
     </div>
     <div th:if="${param.logout}" class="alert alert-success">
         Вы вышли из аккаунта.

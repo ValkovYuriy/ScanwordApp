@@ -11,8 +11,8 @@ function loadScanword(scanword) {
     const title = document.getElementById("title");
     const container = document.getElementById('crosswordContainer');
     const scanwordDivElement = document.createElement('div');
-    const m = scanword.height; // количество строк
-    const n = scanword.width; // количество столбцов
+    const m = scanword.height; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
+    const n = scanword.width; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     let wordCount = 0;
     let tasks = [m * n];
     let tasksPlaces = [wordCount];
@@ -32,13 +32,13 @@ function loadScanword(scanword) {
         } else {
             switch (item.taskType) {
                 case 'VERBAL':
-                    cell.value = "T";
+                    cell.value = 'рџ“„';
                     break;
                 case 'IMAGE':
-                    cell.value = "I";
+                    cell.value = 'рџ–јпёЏ';
                     break;
                 case 'MELODY':
-                    cell.value = "M";
+                    cell.value = 'рџЋµ';
                     break;
             }
             wordCount++;
@@ -90,7 +90,7 @@ function loadScanword(scanword) {
 }
 
 function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
-    // Функция для поиска по горизонтали
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     function findHorizontal() {
         for (let i = 0; i < m; i++) {
             for (let j = 0; j <= n - word.length; j++) {
@@ -106,7 +106,7 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
         return false;
     }
 
-    // Функция для поиска по вертикали
+    // пїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
     function findVertical() {
         for (let j = 0; j < n; j++) {
             for (let i = 0; i <= m - word.length; i++) {
@@ -125,9 +125,9 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
         return false;
     }
 
-    // Поиск слова
+    // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ
     if (!findHorizontal() && !findVertical()) {
-        alert("Слово" + word + " не найдено.");
+        alert("пїЅпїЅпїЅпїЅпїЅ" + word + " пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ.");
     }
 }
 
@@ -146,7 +146,7 @@ async function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
                 type = "melody";
             } else {
                 alert("No Image or Melody or Verbal");
-                continue; // Пропускаем итерацию если тип не соответствует
+                continue; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             }
 
             const request = `${type}/${scanword.content[item].taskId}`;
@@ -154,10 +154,10 @@ async function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
             try {
                 const response = await fetch(request);
                 const dataBase = await response.json();
-                word = dataBase.answer.toUpperCase(); // Приведение текста к верхнему регистру
+                word = dataBase.answer.toUpperCase(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
             } catch (error) {
-                console.error("Ошибка при выполнении запроса:", error);
-                continue; // Пропускаем итерацию при ошибке
+                console.error("пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅ:", error);
+                continue; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
             }
         }
 
