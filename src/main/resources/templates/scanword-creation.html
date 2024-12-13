@@ -174,14 +174,13 @@
             let word = null;
             if(cell.classList.contains('answer-final') || cell.classList.contains('highlight'))
             {
-                console.log(cell);
                 row = cell.dataset.row;
                 col = cell.dataset.col;
                 task = cell.classList.contains('answer-final'); // Проверяем, является ли ячейка заданием
                 if (task) {
                     // Если ячейка является заданием, получаем тип и ID
                     taskType = cell.textContent === '📄'? "VERBAL" : (cell.textContent === '🖼️'? "IMAGE" : "MELODY");
-                    taskId = (taskType === "IMAGE" || taskType === "MELODY") ? cell.dataset.taskId : null; // Предполагаем, что ID хранится в dataset
+                    taskId = (taskType === "IMAGE" || taskType === "MELODY") ? cell.dataset.taskid : null; // Предполагаем, что ID хранится в dataset
                     word = cell.dataset.word;
                 }
                 else

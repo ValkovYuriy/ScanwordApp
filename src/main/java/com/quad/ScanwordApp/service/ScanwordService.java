@@ -4,6 +4,7 @@ import com.quad.ScanwordApp.dto.ScanwordDto;
 import com.quad.ScanwordApp.exception.NotFoundException;
 import com.quad.ScanwordApp.mapper.ScanwordMapper;
 import com.quad.ScanwordApp.model.Scanword;
+import com.quad.ScanwordApp.repository.DictionaryRepository;
 import com.quad.ScanwordApp.repository.ScanwordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ public class ScanwordService {
     private final ScanwordRepository scanwordRepository;
 
     private final ScanwordMapper scanwordMapper;
+    private final DictionaryRepository dictionaryRepository;
 
     public boolean createScanword(ScanwordDto scanwordDto) {
         Scanword scanword = scanwordMapper.toScanword(scanwordDto);
@@ -45,6 +47,7 @@ public class ScanwordService {
     }
     public ScanwordDto addScanword(ScanwordDto scanwordDto) {
         Scanword scanword = scanwordMapper.toScanword(scanwordDto);
+        scanword.setDictionary(dictionaryRepository.findById(scanwordDto.getDictionaryId()).orElse(null));
         return scanwordMapper.toDto(scanwordRepository.save(scanword));
     }
 
