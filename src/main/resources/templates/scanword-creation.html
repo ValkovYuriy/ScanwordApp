@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Создание сканворда</title>
     <link rel="stylesheet" href="/css/styles.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.5.0-beta4/html2canvas.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -160,7 +161,105 @@
     }
 
     function saveScanword() {
-        alert('Сканворд сохранен!');
+        let isCompleted = true;
+        let cells = document.querySelectorAll(`.cell`);
+        let scanwordData = [];
+        cells.forEach(cell => {
+            let row = null;
+            let col = null;
+            let letter = null;
+            let task = null;
+            let taskType = null;
+            let taskId = null;
+            let word = null;
+            if(cell.classList.contains('answer-final') || cell.classList.contains('highlight'))
+            {
+                console.log(cell);
+                row = cell.dataset.row;
+                col = cell.dataset.col;
+                task = cell.classList.contains('answer-final'); // Проверяем, является ли ячейка заданием
+                if (task) {
+                    // Если ячейка является заданием, получаем тип и ID
+                    taskType = cell.textContent === '📄'? "VERBAL" : (cell.textContent === '🖼️'? "IMAGE" : "MELODY");
+                    taskId = (taskType === "IMAGE" || taskType === "MELODY") ? cell.dataset.taskId : null; // Предполагаем, что ID хранится в dataset
+                    word = cell.dataset.word;
+                }
+                else
+                {
+                    letter = cell.textContent;
+                }
+            }
+            else{
+                isCompleted = false;
+            }
+
+            // Добавляем данные ячейки в массив
+            scanwordData.push({
+                row: row,
+                col: col,
+                letter: letter,
+                task: task,
+                taskType: taskType,
+                taskId: taskId,
+                word: word
+            });
+            if(!task)
+            {
+                cell.textContent = "";
+            }
+        });
+        const grid = document.getElementById('scanwordGrid'); // Получаем элемент, который хотим сделать скриншотом
+        // Создаём скриншот
+        html2canvas(grid).then(canvas => {
+            // Получаем Blob из canvas
+            canvas.toBlob(function(blob) {
+                // Теперь blob можно использовать для получения байтового массива
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const preview = new Uint8Array(event.target.result); // Получаем байтовый массив
+                    console.log('Byte Array:', preview);
+
+                    // Теперь создаем объект scanwordDto
+                    const scanwordDto = {
+                        name: localStorage.getItem('scanwordName'),  // Имя сканворда
+                        width: +localStorage.getItem('scanwordWidth'), // Ширина
+                        height: +localStorage.getItem('scanwordHeight'), // Высота
+                        preview: Array.from(preview), // Превью
+                        dictionaryId: localStorage.getItem('dictionaryId'), // ID словаря
+                        content: scanwordData, // Собранные данные о ячейках
+                        isCreated: isCompleted, // Проверяем, завершен ли сканворд
+                        numberOfHints: localStorage.getItem('hintsCount') // Замените на количество подсказок, если есть
+                    };
+                    // Отправляем данные через fetch
+                    fetch('/scanword', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(scanwordDto)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Ошибка сети: ' + response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            console.log('Сканворд успешно добавлен:', data);
+                            alert('Сканворд успешно сохранён!');
+                            window.location.href = "/";
+                        })
+                        .catch(error => {
+                            console.error('Ошибка при добавлении сканворда:', error);
+                            alert('Произошла ошибка при сохранении сканворда.');
+                        });
+                };
+                // Читаем blob как ArrayBuffer
+                reader.readAsArrayBuffer(blob);
+            }, 'image/png'); // Задайте формат изображения
+        }).catch(error => {
+            console.error('Ошибка при создании скриншота:', error);
+        });
     }
 
     function addWord() {
@@ -345,6 +444,7 @@
             const lastCell = lastFinalCells.pop();
             lastCell.classList.remove('answer-final');
             lastCell.textContent = "";
+            lastCell.removeAttribute('data-word', 'data-taskId');
         }
     }
 
@@ -424,11 +524,11 @@
         });
 
         images.forEach(img => {
-            items.push({ answer: img.answer.toUpperCase(), imgSrc: img.base64Image, type: 'image'});
+            items.push({ answer: img.answer.toUpperCase(), imgSrc: img.base64Image, type: 'image', id: img.id});
         });
 
         melodies.forEach(melody => {
-            items.push({ answer: melody.answer.toUpperCase(), name: melody.name, melody64: melody.melody, type: 'audio' });
+            items.push({ answer: melody.answer.toUpperCase(), name: melody.name, melody64: melody.melody, type: 'audio', id: melody.id});
         });
 
         // Переменные для отслеживания направления сортировки
@@ -482,23 +582,30 @@
                 wordItem.querySelector('.item-answer').addEventListener('click', () =>
                 {
                     let icon = '';
+                    let itemID = null;
                     if (item.type === 'text') {
                         icon = '📄'; // Иконка текста
                     } else if (item.type === 'image') {
                         icon = '🖼️'; // Иконка изображения
+                        itemID = item.id;
                     } else if (item.type === 'audio') {
+                        itemID = item.id;
                         icon = '🎵'; // Иконка аудио
                     }
                     let answerCell = lastFinalCells.pop();
                     lastFinalCells.push(answerCell);
                     answerCell.textContent = icon;
+                    answerCell.dataset.taskid = itemID;
                     const arr = [];
                     for (let i = 0; i <= selectedCells.length; i++) {
                         arr.push(item.answer[selectedCells.length - i]);
                     }
+                    answerCell.dataset.word = "";
                     selectedCells.forEach((cell) => {
-                        cell.textContent = arr.pop();
+                        let c = arr.pop();
+                        cell.textContent = c;
                         cell.classList.add("texted");
+                        answerCell.dataset.word += c;
                     });
                     choosen = true;
                 });
