@@ -1,10 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch("scanword/9fd2f3cf-a240-4c41-887d-60ea7cdef02e")
+    fetch("scanword/4508925f-50e3-48df-9580-d3bfc3fc3cc8")
         .then(response => response.json())
         .then(scanword => {
             loadScanword(scanword);
         });
 });
+let isHorizontal = true;
 
 function loadScanword(scanword) {
 
@@ -25,11 +26,7 @@ function loadScanword(scanword) {
         cell.type = 'text';
         cell.className = 'cell';
         cell.maxLength = 1;
-        if (!item.task) {
-            cell.addEventListener('input', function (e) {
-                e.target.value = e.target.value.toUpperCase();
-            });
-        } else {
+        if (item.task) {
             switch (item.taskType) {
                 case 'VERBAL':
                     cell.value = '📄';
@@ -51,7 +48,8 @@ function loadScanword(scanword) {
     let j = 0;
     for (let i = 0; i < m * n; i++) {
         if (tasks[i]) {
-            scanwordDivElement.children[i].disabled = true;
+            scanwordDivElement.children[i].readOnly = true;
+            scanwordDivElement.children[i].style.cursor = 'pointer';
             scanwordDivElement.children[i].style.fontFamily = 'cursive';
             scanwordDivElement.children[i].style.color = 'white';
             scanwordDivElement.children[i].style.backgroundColor = 'black';
@@ -59,34 +57,59 @@ function loadScanword(scanword) {
             tasksPlaces[j++] = i;
         }
     }
-    processItems(tasksPlaces, scanword, scanwordDivElement, m, n);
-    /*
+    processItems(tasksPlaces, scanword, scanwordDivElement, m, n, tasksPlaces);
     tasksPlaces.forEach(item => {
-        let word;
-        if (scanword.content[item].taskId === null) {
-            word = scanword.content[item].word;
-        } else {
-            let type;
-            if (scanword.content[item].taskType === "IMAGE")
-                type = "image";
-            else {
-                if (scanword.content[item].taskType === "MELODY")
-                    type = "melody";
-                else
-                    alert("No Image or Melody or Verbal");
+        const id = scanwordDivElement.children[item].getAttribute("word-id");
+
+        // Добавляем обработчик клика на ячейки с заданиями
+        scanwordDivElement.children[item].addEventListener("click", () => {
+            // Убираем подсветку со всех ячеек
+            document.querySelectorAll('.cell').forEach(cell => {
+                if (cell.getAttribute("word-id") === null) {
+                    cell.style.backgroundColor = cell.getAttribute("horizontal-word-id") === id ||
+                    cell.getAttribute("vertical-word-id") === id ? "yellow" : "white";
+                }
+            });
+            isHorizontal = scanwordDivElement.children[item].getAttribute("horizontally");
+            for (let i = 0; i < scanwordDivElement.children.length; i++) {
+                if (scanwordDivElement.children[i].getAttribute("horizontal-word-id") === id ||
+                    scanwordDivElement.children[i].getAttribute("vertical-word-id") === id) {
+                    scanwordDivElement.children[i].focus();
+                    break;
+                }
             }
-            const request = type + "/" + scanword.content[item].taskId;
-            fetch(request)
-                .then(response => response.json())
-                .then(dataBase => {
-                    word = dataBase.answer;
-                    word = word.toUpperCase();
-                });
+        });
+
+    });
+    for (let i = 0; i < m * n; i++) {
+        if (!tasks[i]) {
+            scanwordDivElement.children[i].addEventListener('input', function (e) {
+                e.target.value = e.target.value.toUpperCase();
+                if (e.target.getAttribute("horizontal-word-id") !== null) {
+                    const id = e.target.getAttribute("horizontal-word-id");
+                    let wordLength = scanword.content[tasksPlaces[id]].word.length;
+                    let pos = 0;
+                    while (scanwordDivElement.children[pos].getAttribute("horizontal-word-id") !== id)
+                        pos++
+                    const start = pos;
+                    let inputWord = "";
+                    while (scanwordDivElement.children[pos].value !== "" && inputWord.length < wordLength) {
+                        inputWord += scanwordDivElement.children[pos++].value;
+                    }
+                    let color = "white";
+                    if (inputWord.length === scanword.content[tasksPlaces[id]].word.length)
+                        color = "red"
+                    if (inputWord === scanword.content[tasksPlaces[id]].word.toUpperCase())
+                        color = "green"
+                    for (let k = start; k < start + wordLength; k++) {
+                        scanwordDivElement.children[k].style.backgroundColor = color;
+                        if (color === "green")
+                            scanwordDivElement.children[k].readOnly = true;
+                    }
+                }
+            });
         }
-        console.log(word);
-        let id = scanwordDivElement.children[item].getAttribute("word-id");
-        findAndMarkWord(word, id, m, n, scanword, scanwordDivElement);
-    });*/
+    }
 }
 
 function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
@@ -95,9 +118,21 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
         for (let i = 0; i < m; i++) {
             for (let j = 0; j <= n - word.length; j++) {
                 let slice = scanword.content.slice(i * n + j, i * n + j + word.length).map(item => item.letter).join('');
-                if (slice === word) {
+                if (slice === word && (j + word.length + 1 > n ||
+                    scanwordDivElement.children[i * n + j + word.length].getAttribute("word-id") != null)) {
                     for (let k = 0; k < word.length; k++) {
                         scanwordDivElement.children[i * n + j + k].setAttribute("horizontal-word-id", id);
+                        if (k < word.length - 1) {
+                            scanwordDivElement.children[i * n + j + k].addEventListener("keyup", (event) => {
+                                if (isHorizontal === "true") {
+                                    //event.target.value = event.target.value.toUpperCase();
+                                    if (event.key !== 'Backspace')
+                                        scanwordDivElement.children[i * n + j + k + 1].focus();
+                                    else if (i * n + j + k - 1 >= 0)
+                                        scanwordDivElement.children[i * n + j + k - 1].focus();
+                                }
+                            });
+                        }
                     }
                     return true;
                 }
@@ -114,9 +149,20 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
                 for (let k = 0; k < word.length; k++) {
                     slice += scanword.content[(i + k) * n + j].letter;
                 }
-                if (slice === word) {
+                if (slice === word && ((i + word.length) * n + j >= scanwordDivElement.children.length ||
+                    scanwordDivElement.children[(i + word.length) * n + j].getAttribute("word-id") != null)) {
                     for (let k = 0; k < word.length; k++) {
                         scanwordDivElement.children[(i + k) * n + j].setAttribute("vertical-word-id", id);
+                        if (k < word.length - 1) {
+                            scanwordDivElement.children[(i + k) * n + j].addEventListener("keyup", (event) => {
+                                if (isHorizontal === "false") {
+                                    if (event.key !== 'Backspace')
+                                        scanwordDivElement.children[(i + k + 1) * n + j].focus();
+                                    else if (i + k - 1 >= 0)
+                                        scanwordDivElement.children[(i + k - 1) * n + j].focus();
+                                }
+                            });
+                        }
                     }
                     return true;
                 }
@@ -126,15 +172,17 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
     }
 
     // ����� �����
-    if (!findHorizontal() && !findVertical()) {
-        alert("�����" + word + " �� �������.");
-    }
+    if (findVertical())
+        return false;
+    if (findHorizontal())
+        return true;
+    alert("Нет найдено слово " + word);
+    return true;
 }
 
 async function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
     for (const item of tasksPlaces) {
         let word;
-
         if (scanword.content[item].taskId === null) {
             word = scanword.content[item].word;
             word = word.toUpperCase();
@@ -160,9 +208,11 @@ async function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
                 continue; // ���������� �������� ��� ������
             }
         }
-
-        console.log(word);
         let id = scanwordDivElement.children[item].getAttribute("word-id");
-        findAndMarkWord(word, id, m, n, scanword, scanwordDivElement);
+        const isHorizontal = findAndMarkWord(word, id, m, n, scanword, scanwordDivElement);
+        if (isHorizontal)
+            scanwordDivElement.children[item].setAttribute("horizontally", "true");
+        else
+            scanwordDivElement.children[item].setAttribute("horizontally", "false");
     }
 }
