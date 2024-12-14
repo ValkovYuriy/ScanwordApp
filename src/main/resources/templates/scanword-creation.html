@@ -453,6 +453,10 @@
         if (!cell) return;
 
         if (cell.classList.contains('answer-preview')) {
+            const arrowImg = document.createElement('img');
+            arrowImg.src = 'down.png';
+            arrowImg.style.display = 'block';
+            cell.appendChild(arrowImg);
             answerAdded = true;
             cell.classList.add('answer-final');
             cell.classList.add(`id-${currentID}`);

@@ -34,7 +34,6 @@ public class ScanwordController {
     @PostMapping
     public ScanwordDto addScanword(@RequestBody @Valid ScanwordDto scanwordDto){
         ScanwordDto scanwordDto1 = scanwordService.addScanword(scanwordDto);
-        System.out.println(scanwordDto1);
         return scanwordDto1;
     }
 

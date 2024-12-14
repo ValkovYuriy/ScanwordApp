@@ -41,6 +41,7 @@ public class MelodyController {
         return melodyDto;
     }
 
+
     @PostMapping
     public MelodyDto addMelody(@RequestParam("audio") MultipartFile melody,
                                   @RequestParam("question") String question,
@@ -61,10 +62,6 @@ public class MelodyController {
         return melodyDto1;
     }
 
-//    @DeleteMapping("/{id}")
-//    public void deleteMelody(@PathVariable UUID id) {
-//        melodyService.deleteMelody(id);
-//    }
 
     @DeleteMapping("/{name}")
     public void deleteMelodyByName(@PathVariable String name)  {

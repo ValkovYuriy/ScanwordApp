@@ -371,6 +371,7 @@
                                     // Очистка полей ввода
                                     inputs[0].value = '';
                                     inputs[1].value = '';
+                                    message.textContent = '';
                                     const row = document.createElement('tr');
                                     const wordCell = document.createElement('td');
                                     const definitionCell = document.createElement('td');
@@ -418,6 +419,7 @@
                                         inputs[0].value = '';
                                         inputs[1].value = '';
                                         imageInput.value = "";
+                                        message.textContent = '';
                                         dictionaryTableBody.rows[0].cells[2].innerHTML = '';
                                         dictionaryTableBody.rows[0].cells[2].appendChild(imageInput);
                                         const row = document.createElement('tr');
@@ -461,10 +463,8 @@
                         if (name.length > 60) {
                             message.textContent = 'Длина названия мелодии превышает 60 символов';
                             message.style.display = 'block';
-                        } else if (!containsOnlyNonEnglish(name)) {
-                            message.textContent = 'Допустимы только символы кириллицы';
-                            message.style.display = 'block';
-                        } else {
+                        }
+                        else {
                             const file = melodyInput.files[0];
                             if (file && name) {
                                 if (file.size > maxSizeInBytes) {
@@ -474,6 +474,7 @@
                                     inputs[1].value = '';
                                     inputs[2].value = '';
                                     melodyInput.value = "";
+                                    message.textContent = '';
                                     dictionaryTableBody.rows[0].cells[2].innerHTML = '';
                                     const nameInput = document.createElement('input');
                                     nameInput.type = 'text';
