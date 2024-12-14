@@ -11,14 +11,14 @@ let CurrentId = "";
 
 function loadDictionary(scanword) {
     const dictionaryId = scanword.dictionaryId;
-    fetch("dictionary/" + dictionaryId)
+    fetch("create_api/" + dictionaryId)
         .then(response => response.json())
-        .then(dictionary => {
-            loadScanword(scanword, dictionary)
+        .then(dataAll => {
+            loadScanword(scanword, dataAll)
         });
 }
 
-function loadScanword(scanword, dicionary) {
+function loadScanword(scanword, dataAll) {
 
     const title = document.getElementById("title");
     const container = document.getElementById('crosswordContainer');
@@ -75,10 +75,43 @@ function loadScanword(scanword, dicionary) {
         scanwordDivElement.children[item].addEventListener("click", () => {
             let word = scanword.content[item].word;
             let wordIndex = 0;
-            while (dicionary.dictionaryData[wordIndex].word !== word)
-                wordIndex++;
             definition = document.getElementById("definition");
-            definition.innerText = dicionary.dictionaryData[wordIndex].definition;
+            image = document.getElementById("image");
+            melody = document.getElementById("melody");
+            switch (scanword.content[item].taskType) {
+                case 'VERBAL':
+                    image.src = "";
+                    melody.src = "";
+                    melody.controls = false;
+                    while (dataAll.data.dictionaryData[wordIndex].word !== word)
+                        wordIndex++;
+                    definition.innerText = dataAll.data.dictionaryData[wordIndex].definition;
+                    break;
+                case 'IMAGE':
+                    melody.src = "";
+                    melody.controls = false;
+                    while (dataAll.data.images[wordIndex].answer !== word)
+                        wordIndex++;
+                    image.src = dataAll.data.images[wordIndex].base64Image;
+                    definition.innerText = dataAll.data.images[wordIndex].question;
+                    break;
+                case 'MELODY':
+                    while (dataAll.data.melodies[wordIndex].answer !== word)
+                        wordIndex++;
+                    definition.innerText = dataAll.data.melodies[wordIndex].question;
+                    const base64Melody = dataAll.data.melodies[wordIndex].melody;
+                    // Преобразуем base64 в бинарные данные
+                    const byteCharacters = atob(base64Melody);
+                    const byteNumbers = new Uint8Array(byteCharacters.length);
+                    for (let i = 0; i < byteCharacters.length; i++) {
+                        byteNumbers[i] = byteCharacters.charCodeAt(i);
+                    }
+                    const audioBlob = new Blob([byteNumbers], {type: 'audio/mpeg'}); // Укажите правильный тип аудио
+                    const audioURL = URL.createObjectURL(audioBlob);
+                    melody.controls = true;
+                    melody.src = audioURL;
+                    break;
+            }
             document.querySelectorAll('.cell-allocated').forEach(cell => {
                 cell.className = "cell";
             });

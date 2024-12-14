@@ -6,6 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.rmi.server.UID;
+import java.util.UUID;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +25,8 @@ public class Cell {
     private boolean task;
 
     private TaskType taskType;
+
+    private UUID taskId;
 
     private String word;
 }
