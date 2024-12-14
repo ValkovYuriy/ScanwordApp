@@ -40,19 +40,6 @@ header .help:hover {
     width: fit-content;
 }
 
-.cellWrapper {
-    position: relative; /* Позволяет использовать абсолютное позиционирование для изображения */
-    width: 30px; /* Контейнер ячейки должен соответствовать размеру ячейки */
-    height: 30px; /* Высота совпадает с высотой ячейки */
-}
-
-.cellWrapper img {
-    position: absolute; /* Размещение изображения в ячейке */
-    width: 100%; /* Ширина изображения на 100% от ширины контейнера */
-    height: 100%; /* Высота изображения на 100% от высоты контейнера */
-    object-fit: cover; /* Обеспечивает правильное обрезание изображения */
-}
-
 .cell {
     width: 28px;
     height: 30px;
@@ -62,8 +49,41 @@ header .help:hover {
     line-height: 30px;
     background-color: white;
     margin: -1px;
+    outline: none;
 }
-.cell:focus {
-    background-color: #e0e0e0;
+
+.cell-allocated {
+    width: 28px;
+    height: 30px;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 20px;
+    line-height: 30px;
+    margin: -1px;
+    background-color: yellow;
+    outline: none;
+}
+
+.cell-solved {
+    width: 28px;
+    height: 30px;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 20px;
+    line-height: 30px;
+    margin: -1px;
+    background-color: green;
+    outline: none;
+}
+
+.cell-wrong {
+    width: 28px;
+    height: 30px;
+    border: 1px solid #000;
+    text-align: center;
+    font-size: 20px;
+    line-height: 30px;
+    margin: -1px;
+    background-color: red;
     outline: none;
 }

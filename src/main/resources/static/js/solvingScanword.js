@@ -2,12 +2,23 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch("scanword/4508925f-50e3-48df-9580-d3bfc3fc3cc8")
         .then(response => response.json())
         .then(scanword => {
-            loadScanword(scanword);
+            loadDictionary(scanword)
         });
+
 });
 let isHorizontal = true;
+let CurrentId = "";
 
-function loadScanword(scanword) {
+function loadDictionary(scanword) {
+    const dictionaryId = scanword.dictionaryId;
+    fetch("dictionary/" + dictionaryId)
+        .then(response => response.json())
+        .then(dictionary => {
+            loadScanword(scanword, dictionary)
+        });
+}
+
+function loadScanword(scanword, dicionary) {
 
     const title = document.getElementById("title");
     const container = document.getElementById('crosswordContainer');
@@ -60,52 +71,65 @@ function loadScanword(scanword) {
     processItems(tasksPlaces, scanword, scanwordDivElement, m, n, tasksPlaces);
     tasksPlaces.forEach(item => {
         const id = scanwordDivElement.children[item].getAttribute("word-id");
-
         // Добавляем обработчик клика на ячейки с заданиями
         scanwordDivElement.children[item].addEventListener("click", () => {
-            // Убираем подсветку со всех ячеек
+            let word = scanword.content[item].word;
+            let wordIndex = 0;
+            while (dicionary.dictionaryData[wordIndex].word !== word)
+                wordIndex++;
+            definition = document.getElementById("definition");
+            definition.innerText = dicionary.dictionaryData[wordIndex].definition;
+            document.querySelectorAll('.cell-allocated').forEach(cell => {
+                cell.className = "cell";
+            });
             document.querySelectorAll('.cell').forEach(cell => {
-                if (cell.getAttribute("word-id") === null) {
-                    cell.style.backgroundColor = cell.getAttribute("horizontal-word-id") === id ||
-                    cell.getAttribute("vertical-word-id") === id ? "yellow" : "white";
+                if (cell.getAttribute("horizontal-word-id") === id ||
+                    cell.getAttribute("vertical-word-id") === id) {
+                    cell.className = "cell-allocated";
                 }
             });
             isHorizontal = scanwordDivElement.children[item].getAttribute("horizontally");
-            for (let i = 0; i < scanwordDivElement.children.length; i++) {
-                if (scanwordDivElement.children[i].getAttribute("horizontal-word-id") === id ||
-                    scanwordDivElement.children[i].getAttribute("vertical-word-id") === id) {
-                    scanwordDivElement.children[i].focus();
-                    break;
-                }
-            }
+            //выделяем 1 букву слова на сканворде, соответствующую заданию
+            let pos = 0;
+            while (scanwordDivElement.children[pos].getAttribute("horizontal-word-id") !== id &&
+            scanwordDivElement.children[pos].getAttribute("vertical-word-id") !== id)
+                pos++;
+            scanwordDivElement.children[pos].focus();
+            CurrentId = id;
         });
 
     });
     for (let i = 0; i < m * n; i++) {
         if (!tasks[i]) {
+            // добавляем обработчик ввода на клетки с буквами
             scanwordDivElement.children[i].addEventListener('input', function (e) {
                 e.target.value = e.target.value.toUpperCase();
-                if (e.target.getAttribute("horizontal-word-id") !== null) {
-                    const id = e.target.getAttribute("horizontal-word-id");
-                    let wordLength = scanword.content[tasksPlaces[id]].word.length;
+                const wordLength = scanword.content[tasksPlaces[CurrentId]].word.length;
+                let inputWord = "";
+                if (e.target.className === "cell-allocated") {
                     let pos = 0;
-                    while (scanwordDivElement.children[pos].getAttribute("horizontal-word-id") !== id)
-                        pos++
-                    const start = pos;
-                    let inputWord = "";
-                    while (scanwordDivElement.children[pos].value !== "" && inputWord.length < wordLength) {
-                        inputWord += scanwordDivElement.children[pos++].value;
+                    while (scanwordDivElement.children[pos].getAttribute("horizontal-word-id") !== CurrentId &&
+                    scanwordDivElement.children[pos].getAttribute("vertical-word-id") !== CurrentId)
+                        pos++;
+                    for (let k = 0; k < wordLength; k++) {
+                        const nextIndex = isHorizontal === "true" ? pos + k : (k * n) + pos;
+                        if (scanwordDivElement.children[nextIndex].value !== "")
+                            inputWord += scanwordDivElement.children[nextIndex].value;
                     }
-                    let color = "white";
-                    if (inputWord.length === scanword.content[tasksPlaces[id]].word.length)
-                        color = "red"
-                    if (inputWord === scanword.content[tasksPlaces[id]].word.toUpperCase())
-                        color = "green"
-                    for (let k = start; k < start + wordLength; k++) {
-                        scanwordDivElement.children[k].style.backgroundColor = color;
-                        if (color === "green")
-                            scanwordDivElement.children[k].readOnly = true;
-                    }
+                }
+                if (inputWord.length === wordLength) {
+                    document.querySelectorAll('.cell-allocated').forEach(cell => {
+                        if (inputWord === scanword.content[tasksPlaces[CurrentId]].word.toUpperCase()) {
+                            cell.className = "cell-solved";
+                            cell.readOnly = true;
+                        } else
+                            cell.className = "cell-wrong";
+                    });
+                } else if (e.target.className === "cell-wrong" && e.target.value === "") {
+                    document.querySelectorAll('.cell-wrong').forEach((cell) => {
+                        if (cell.getAttribute("horizontal-word-id") === CurrentId || cell.getAttribute("vertical-word-id") === CurrentId)
+                            cell.className = "cell-allocated";
+                    });
                 }
             });
         }
@@ -113,7 +137,6 @@ function loadScanword(scanword) {
 }
 
 function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
-    // ������� ��� ������ �� �����������
     function findHorizontal() {
         for (let i = 0; i < m; i++) {
             for (let j = 0; j <= n - word.length; j++) {
@@ -122,17 +145,15 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
                     scanwordDivElement.children[i * n + j + word.length].getAttribute("word-id") != null)) {
                     for (let k = 0; k < word.length; k++) {
                         scanwordDivElement.children[i * n + j + k].setAttribute("horizontal-word-id", id);
-                        if (k < word.length - 1) {
-                            scanwordDivElement.children[i * n + j + k].addEventListener("keyup", (event) => {
-                                if (isHorizontal === "true") {
-                                    //event.target.value = event.target.value.toUpperCase();
-                                    if (event.key !== 'Backspace')
-                                        scanwordDivElement.children[i * n + j + k + 1].focus();
-                                    else if (i * n + j + k - 1 >= 0)
-                                        scanwordDivElement.children[i * n + j + k - 1].focus();
-                                }
-                            });
-                        }
+                        // добавляем обработчик горизонтального движения
+                        scanwordDivElement.children[i * n + j + k].addEventListener("keyup", (event) => {
+                            if (isHorizontal === "true") {
+                                if (event.key !== 'Backspace' && k < word.length - 1)
+                                    scanwordDivElement.children[i * n + j + k + 1].focus();
+                                if (event.key === 'Backspace' && (j + k) % n !== 0 && scanwordDivElement.children[i * n + j + k - 1].getAttribute("word-id") === null)
+                                    scanwordDivElement.children[i * n + j + k - 1].focus();
+                            }
+                        });
                     }
                     return true;
                 }
@@ -141,7 +162,6 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
         return false;
     }
 
-    // ������� ��� ������ �� ���������
     function findVertical() {
         for (let j = 0; j < n; j++) {
             for (let i = 0; i <= m - word.length; i++) {
@@ -153,16 +173,15 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
                     scanwordDivElement.children[(i + word.length) * n + j].getAttribute("word-id") != null)) {
                     for (let k = 0; k < word.length; k++) {
                         scanwordDivElement.children[(i + k) * n + j].setAttribute("vertical-word-id", id);
-                        if (k < word.length - 1) {
-                            scanwordDivElement.children[(i + k) * n + j].addEventListener("keyup", (event) => {
-                                if (isHorizontal === "false") {
-                                    if (event.key !== 'Backspace')
-                                        scanwordDivElement.children[(i + k + 1) * n + j].focus();
-                                    else if (i + k - 1 >= 0)
-                                        scanwordDivElement.children[(i + k - 1) * n + j].focus();
-                                }
-                            });
-                        }
+                        // добавляем обработчик вертикального движения
+                        scanwordDivElement.children[(i + k) * n + j].addEventListener("keyup", (event) => {
+                            if (isHorizontal === "false") {
+                                if (event.key !== 'Backspace' && k < word.length - 1)
+                                    scanwordDivElement.children[(i + k + 1) * n + j].focus();
+                                if (event.key === 'Backspace' && i + k - 1 >= 0 && scanwordDivElement.children[(i + k - 1) * n + j].getAttribute("word-id") === null)
+                                    scanwordDivElement.children[(i + k - 1) * n + j].focus();
+                            }
+                        });
                     }
                     return true;
                 }
@@ -171,7 +190,6 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
         return false;
     }
 
-    // ����� �����
     if (findVertical())
         return false;
     if (findHorizontal())
@@ -180,34 +198,11 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
     return true;
 }
 
-async function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
+function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
     for (const item of tasksPlaces) {
         let word;
-        if (scanword.content[item].taskId === null) {
-            word = scanword.content[item].word;
-            word = word.toUpperCase();
-        } else {
-            let type;
-            if (scanword.content[item].taskType === "IMAGE") {
-                type = "image";
-            } else if (scanword.content[item].taskType === "MELODY") {
-                type = "melody";
-            } else {
-                alert("No Image or Melody or Verbal");
-                continue; // ���������� �������� ���� ��� �� �������������
-            }
-
-            const request = `${type}/${scanword.content[item].taskId}`;
-
-            try {
-                const response = await fetch(request);
-                const dataBase = await response.json();
-                word = dataBase.answer.toUpperCase(); // ���������� ������ � �������� ��������
-            } catch (error) {
-                console.error("������ ��� ���������� �������:", error);
-                continue; // ���������� �������� ��� ������
-            }
-        }
+        word = scanword.content[item].word;
+        word = word.toUpperCase();
         let id = scanwordDivElement.children[item].getAttribute("word-id");
         const isHorizontal = findAndMarkWord(word, id, m, n, scanword, scanwordDivElement);
         if (isHorizontal)
