@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-    fetch("scanword/4508925f-50e3-48df-9580-d3bfc3fc3cc8")
+    const scanwordId = localStorage.getItem("scanword-id");
+    fetch("scanword/" + scanwordId)
         .then(response => response.json())
         .then(scanword => {
             loadDictionary(scanword)
@@ -19,7 +20,7 @@ function loadDictionary(scanword) {
 }
 
 function loadScanword(scanword, dataAll) {
-
+    const id = localStorage.getItem("draft-scanword-id");
     const title = document.getElementById("title");
     const container = document.getElementById('crosswordContainer');
     const scanwordDivElement = document.createElement('div');
@@ -76,7 +77,9 @@ function loadScanword(scanword, dataAll) {
             let word = scanword.content[item].word;
             let wordIndex = 0;
             definition = document.getElementById("definition");
+            definition.className = "definition";
             image = document.getElementById("image");
+            image.className = "image";
             melody = document.getElementById("melody");
             switch (scanword.content[item].taskType) {
                 case 'VERBAL':
@@ -96,6 +99,7 @@ function loadScanword(scanword, dataAll) {
                     definition.innerText = dataAll.data.images[wordIndex].question;
                     break;
                 case 'MELODY':
+                    image.src = "";
                     while (dataAll.data.melodies[wordIndex].answer !== word)
                         wordIndex++;
                     definition.innerText = dataAll.data.melodies[wordIndex].question;
@@ -163,6 +167,9 @@ function loadScanword(scanword, dataAll) {
                         if (cell.getAttribute("horizontal-word-id") === CurrentId || cell.getAttribute("vertical-word-id") === CurrentId)
                             cell.className = "cell-allocated";
                     });
+                }
+                if (m * n - wordCount === document.querySelectorAll('.cell-solved').length) {
+                    alert("Сканворд полностью разгадан. Поздравляем!");
                 }
             });
         }

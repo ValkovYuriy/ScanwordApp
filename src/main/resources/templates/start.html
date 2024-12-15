@@ -107,7 +107,12 @@
             },
             body: JSON.stringify(requestData) // Преобразуем данные в JSON
         })
-        localStorage.setItem('draft-scanword-id', id);
+            .then(response => response.json())
+            .then(data => {
+                localStorage.setItem('draft-scanword-id', data.id);
+                localStorage.setItem('scanword-id',data.scanwordId);
+            });
+
         window.location.href = 'solving-scanword';
     });
 
