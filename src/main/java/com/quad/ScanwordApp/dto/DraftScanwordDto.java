@@ -21,7 +21,6 @@ public class DraftScanwordDto {
     @NotNull
     private UUID scanwordId;
 
-    @NotNull
     private UUID ownerId;
 
     private List<Cell> content = new ArrayList<>();

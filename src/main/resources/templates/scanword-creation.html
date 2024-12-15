@@ -122,7 +122,9 @@
     const height = +localStorage.getItem('scanwordHeight');
     const maxLineLength = 10;
     const minLineLength = 2;
-
+    let dictionaryData = [];
+    let images = [];
+    let melodies = [];
     let isMouseDown = false;
     let startCell = null;
     let selectedCells = [];
@@ -141,7 +143,19 @@
         document.addEventListener('mousemove', handleMouseMove);
         document.addEventListener('mouseup', handleMouseUp);
         document.addEventListener('keydown', handleKeyDown);
+        getData();
     });
+
+    function getData(){
+        const dictionaryId = localStorage.getItem('dictionaryId');
+        fetch('/create_api/' + dictionaryId)
+            .then(response => response.json())
+            .then(dataAll => {
+                dictionaryData = dataAll.data.dictionaryData;
+                images = dataAll.data.images;
+                melodies = dataAll.data.melodies;
+            });
+    }
 
     function createGrid(cols, rows) {
         const grid = document.getElementById('scanwordGrid');
@@ -180,7 +194,7 @@
                 if (task) {
                     // Если ячейка является заданием, получаем тип и ID
                     taskType = cell.textContent === '📄'? "VERBAL" : (cell.textContent === '🖼️'? "IMAGE" : "MELODY");
-                    taskId = (taskType === "IMAGE" || taskType === "MELODY") ? cell.dataset.taskid : null; // Предполагаем, что ID хранится в dataset
+                    //taskId = (taskType === "IMAGE" || taskType === "MELODY") ? cell.dataset.taskid : null; // Предполагаем, что ID хранится в dataset
                     word = cell.dataset.word;
                 }
                 else
@@ -453,10 +467,6 @@
         if (!cell) return;
 
         if (cell.classList.contains('answer-preview')) {
-            const arrowImg = document.createElement('img');
-            arrowImg.src = 'down.png';
-            arrowImg.style.display = 'block';
-            cell.appendChild(arrowImg);
             answerAdded = true;
             cell.classList.add('answer-final');
             cell.classList.add(`id-${currentID}`);
@@ -479,7 +489,18 @@
                 regex += cell.textContent;
             }
         });
-        fetch(`/create_api?length=${selectedCells.length}&regex=${regex}&dictionaryId=${localStorage.getItem('dictionaryId')}`) // Замените на ваши параметры
+        const requestData = {
+            dictionaryData: dictionaryData,
+            images: images,
+            melodies: melodies
+        };
+        fetch(`/create_api/${regex}`,{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Обязательно укажите тип содержимого
+            },
+            body: JSON.stringify(requestData) // Преобразуем данные в JSON
+        }) // Замените на ваши параметры
             .then(response => response.json())
             .then(data => {
                 console.log("Полученные данные:", data); // Проверяем структуру ответа

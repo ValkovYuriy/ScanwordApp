@@ -342,7 +342,7 @@
             const inputs = row.querySelectorAll('input');
             const maxSizeInBytes = 1024 * 1024; // 1 МБ в байтах
             if (inputs.length >= 2) {
-                const word = inputs[0].value.trim();
+                const word = inputs[0].value.trim().toUpperCase();
                 const definition = inputs[1].value.trim();
                 if (word.length > 10) {
                     message.textContent = 'Длина ответа превышает 10 символов';

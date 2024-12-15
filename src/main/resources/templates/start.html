@@ -36,48 +36,51 @@
         const spinner = document.getElementById('spinner');
         spinner.style.display = 'flex';
 
-        fetch('/image')
+        fetch('/scanword')
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Сеть не в порядке');
                 }
                 return response.json();
             })
-            .then(images => {
+            .then(scanwords => {
                 const grid = document.getElementById('image-grid');
-                images.forEach(image => {
-                    const item = document.createElement('div');
-                    item.className = 'item';
-                    console.debug(image);
-                    const img = document.createElement('img');
-                    img.src = image.base64Image;
-                    img.alt = "Сканворд";
-                    img.style.maxWidth = "100%";
+                scanwords.forEach(scanword => {
+                    if(scanword.isCreated) {
+                        const item = document.createElement('div');
+                        item.className = 'item';
+                        console.debug(scanword);
+                        const img = document.createElement('img');
+                        img.src = scanword.base64Image;
+                        img.alt = "Сканворд";
+                        img.style.maxWidth = "100%";
 
-                    item.prepend(img);
-                    item.innerHTML += `<p>Сканворд: ${image.answer}</p>`;
-                    const buttonContainer = document.getElementById('button-container');
-                    buttonContainer.style.display = 'flex';
-                    buttonContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    const backButton = document.getElementById('back-button');
-                    backButton.hidden = false;
-                    // Добавляем обработчик клика на элемент
-                    item.addEventListener('click', function() {
-                        // Снимаем выделение с предыдущих элементов
-                        document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
+                        item.prepend(img);
+                        item.innerHTML += `<p>Сканворд: ${scanword.name}</p>`;
+                        item.innerHTML += `<p>Количество подсказок: ${scanword.numberOfHints}</p>`;
+                        const buttonContainer = document.getElementById('button-container');
+                        buttonContainer.style.display = 'flex';
+                        buttonContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
+                        const backButton = document.getElementById('back-button');
+                        backButton.hidden = false;
+                        // Добавляем обработчик клика на элемент
+                        item.addEventListener('click', function () {
+                            // Снимаем выделение с предыдущих элементов
+                            document.querySelectorAll('.item').forEach(i => i.classList.remove('selected'));
 
-                        // Выделяем текущий элемент
-                        item.classList.add('selected');
+                            // Выделяем текущий элемент
+                            item.classList.add('selected');
 
-                        // Настраиваем кнопку "Выбрать"
-                        const selectButton = document.getElementById('select-button');
-                        selectButton.hidden = false;
-                        selectButton.setAttribute('data-id', image.id);
+                            // Настраиваем кнопку "Выбрать"
+                            const selectButton = document.getElementById('select-button');
+                            selectButton.hidden = false;
+                            selectButton.setAttribute('data-id', scanword.id);
+                            selectButton.setAttribute('data-content', JSON.stringify(scanword.content));
+                            selectButton.scrollIntoView({behavior: 'smooth'});
+                        });
 
-                        selectButton.scrollIntoView({behavior: 'smooth'});
-                    });
-
-                    grid.appendChild(item);
+                        grid.appendChild(item);
+                    }
                 });
 
                 // Скрыть спиннер после загрузки
@@ -92,6 +95,18 @@
     // Обработчик для кнопки "Выбрать"
     document.getElementById('select-button').addEventListener('click', function() {
         const id = this.getAttribute('data-id');
+        const content = JSON.parse(this.getAttribute('data-content'));
+        const requestData = {
+            scanwordId: id,
+            content: content
+        }
+        fetch('draft-scanword',{
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // Обязательно укажите тип содержимого
+            },
+            body: JSON.stringify(requestData) // Преобразуем данные в JSON
+        })
         alert(`Выбранный сканворд с ID: ${id} будет обработан.`);
     });
 

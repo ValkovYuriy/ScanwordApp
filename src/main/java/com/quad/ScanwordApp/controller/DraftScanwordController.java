@@ -2,9 +2,11 @@ package com.quad.ScanwordApp.controller;
 
 
 import com.quad.ScanwordApp.dto.DraftScanwordDto;
+import com.quad.ScanwordApp.dto.ResponseDto;
 import com.quad.ScanwordApp.service.DraftScanwordService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,15 +40,15 @@ public class DraftScanwordController {
     }
 
     @PostMapping
-    public DraftScanwordDto addDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto){
+    public ResponseEntity<ResponseDto<DraftScanwordDto>> addDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto){
         DraftScanwordDto scanwordDto1 = draftScanwordService.addDraftScanword(scanwordDto);
-        return scanwordDto1;
+        return ResponseEntity.ok(new ResponseDto<>("success",scanwordDto1));
     }
 
     @PutMapping
-    public DraftScanwordDto updateDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto, @RequestParam UUID id){
+    public ResponseEntity<ResponseDto<DraftScanwordDto>> updateDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto, @RequestParam UUID id){
         DraftScanwordDto scanwordDto1 = draftScanwordService.updateDraftScanword(scanwordDto,id);
-        return scanwordDto1;
+        return ResponseEntity.ok(new ResponseDto<>("success",scanwordDto1));
     }
 
     @DeleteMapping("/{id}")

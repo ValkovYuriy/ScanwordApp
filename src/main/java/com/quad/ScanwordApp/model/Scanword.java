@@ -57,8 +57,8 @@ public class Scanword {
     private List<Cell> content = new ArrayList<>();
 
     @Column(name = "is_created",nullable = false)
-    private boolean isCreated;
+    private Boolean isCreated;
 
     @Column(name = "number_of_hints",nullable = false)
-    private int numberOfHints;
+    private Integer numberOfHints;
 }

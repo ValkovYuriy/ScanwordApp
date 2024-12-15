@@ -25,7 +25,7 @@ public class Cell {
 
     private TaskType taskType;
 
-    private UUID taskId;
-
     private String word;
+
+    private UUID taskId;
 }
