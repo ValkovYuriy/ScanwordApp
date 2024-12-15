@@ -96,10 +96,20 @@
     document.getElementById('select-button').addEventListener('click', function() {
         const id = this.getAttribute('data-id');
         const content = JSON.parse(this.getAttribute('data-content'));
+        postDraftScanword(id,content);
+    });
+
+    // Обработчик для кнопки "Назад"
+    document.getElementById('back-button').addEventListener('click', function() {
+        window.location.href = '/';
+    });
+
+    function postDraftScanword(id,content){
         const requestData = {
             scanwordId: id,
             content: content
         }
+
         fetch('draft-scanword',{
             method: 'POST',
             headers: {
@@ -108,18 +118,12 @@
             body: JSON.stringify(requestData) // Преобразуем данные в JSON
         })
             .then(response => response.json())
-            .then(data => {
-                localStorage.setItem('draft-scanword-id', data.id);
-                localStorage.setItem('scanword-id',data.scanwordId);
+            .then(dataAll => {
+                localStorage.setItem('draft-scanword-id', dataAll.data.id);
+                localStorage.setItem('scanword-id',dataAll.data.scanwordId);
+                window.location.href = 'solving-scanword';
             });
-
-        window.location.href = 'solving-scanword';
-    });
-
-    // Обработчик для кнопки "Назад"
-    document.getElementById('back-button').addEventListener('click', function() {
-        window.location.href = '/';
-    });
+    }
 </script>
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
