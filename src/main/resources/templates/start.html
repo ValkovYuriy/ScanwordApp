@@ -107,7 +107,8 @@
             },
             body: JSON.stringify(requestData) // Преобразуем данные в JSON
         })
-        alert(`Выбранный сканворд с ID: ${id} будет обработан.`);
+        localStorage.setItem('draft-scanword-id', id);
+        window.location.href = 'solving-scanword';
     });
 
     // Обработчик для кнопки "Назад"
