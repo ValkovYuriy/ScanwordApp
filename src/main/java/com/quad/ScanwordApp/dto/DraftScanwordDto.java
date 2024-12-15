@@ -24,4 +24,6 @@ public class DraftScanwordDto {
     private UUID ownerId;
 
     private List<Cell> content = new ArrayList<>();
+
+    private Boolean solved = false;
 }

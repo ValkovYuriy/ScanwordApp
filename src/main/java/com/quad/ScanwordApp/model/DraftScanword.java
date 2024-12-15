@@ -50,4 +50,9 @@ public class DraftScanword {
     @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "content")
     private List<Cell> content = new ArrayList<>();
+
+
+    @Column(name = "is_solved")
+    private Boolean solved;
+
 }
