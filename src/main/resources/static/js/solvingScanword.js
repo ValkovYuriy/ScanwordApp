@@ -3,24 +3,32 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch("scanword/" + scanwordId)
         .then(response => response.json())
         .then(scanword => {
-            loadDictionary(scanword)
+            loadDraft(scanword)
         });
-
 });
 let isHorizontal = true;
 let CurrentId = "";
+let hintCount = 3;
 
-function loadDictionary(scanword) {
+function loadDraft(scanword) {
+    const draftId = localStorage.getItem("draft-scanword-id");
+    fetch("draft-scanword/" + draftId)
+        .then(response => response.json())
+        .then(draft => {
+            loadDictionary(scanword, draft)
+        });
+}
+
+function loadDictionary(scanword, draft) {
     const dictionaryId = scanword.dictionaryId;
     fetch("create_api/" + dictionaryId)
         .then(response => response.json())
         .then(dataAll => {
-            loadScanword(scanword, dataAll)
+            loadScanword(scanword, draft, dataAll)
         });
 }
 
-function loadScanword(scanword, dataAll) {
-    const id = localStorage.getItem("draft-scanword-id");
+function loadScanword(scanword, draft, dataAll) {
     const title = document.getElementById("title");
     const container = document.getElementById('crosswordContainer');
     const scanwordDivElement = document.createElement('div');
@@ -30,6 +38,7 @@ function loadScanword(scanword, dataAll) {
     let tasks = [m * n];
     let tasksPlaces = [wordCount];
     let index = 0;
+    const draftContent = draft.content;
     scanwordDivElement.className = 'scanwordDivElement';
     title.innerText = scanword.name;
     scanwordDivElement.style.gridTemplateColumns = "repeat(" + n + ", 30px)";
@@ -42,11 +51,14 @@ function loadScanword(scanword, dataAll) {
             switch (item.taskType) {
                 case 'VERBAL':
                     cell.value = '📄';
+                    cell.title = "Текстовое задание";
                     break;
                 case 'IMAGE':
                     cell.value = '🖼️';
+                    cell.title = "Задание с картинкой";
                     break;
                 case 'MELODY':
+                    cell.title = "Задание с мелодией";
                     cell.value = '🎵';
                     break;
             }
@@ -70,20 +82,19 @@ function loadScanword(scanword, dataAll) {
         }
     }
     processItems(tasksPlaces, scanword, scanwordDivElement, m, n, tasksPlaces);
+    //обработчик клика на задание
     tasksPlaces.forEach(item => {
         const id = scanwordDivElement.children[item].getAttribute("word-id");
         // Добавляем обработчик клика на ячейки с заданиями
         scanwordDivElement.children[item].addEventListener("click", () => {
             let word = scanword.content[item].word;
-            let wordIndex = 0;
+            let wordIndex = 0, definition, image, melody;
             definition = document.getElementById("definition");
-            definition.className = "definition";
             image = document.getElementById("image");
-            image.className = "image";
             melody = document.getElementById("melody");
             switch (scanword.content[item].taskType) {
                 case 'VERBAL':
-                    image.src = "";
+                    image.style.display = "none";
                     melody.src = "";
                     melody.controls = false;
                     while (dataAll.data.dictionaryData[wordIndex].word !== word)
@@ -91,6 +102,7 @@ function loadScanword(scanword, dataAll) {
                     definition.innerText = dataAll.data.dictionaryData[wordIndex].definition;
                     break;
                 case 'IMAGE':
+                    image.style.display = "block";
                     melody.src = "";
                     melody.controls = false;
                     while (dataAll.data.images[wordIndex].answer !== word)
@@ -99,7 +111,7 @@ function loadScanword(scanword, dataAll) {
                     definition.innerText = dataAll.data.images[wordIndex].question;
                     break;
                 case 'MELODY':
-                    image.src = "";
+                    image.style.display = "none";
                     while (dataAll.data.melodies[wordIndex].answer !== word)
                         wordIndex++;
                     definition.innerText = dataAll.data.melodies[wordIndex].question;
@@ -174,9 +186,31 @@ function loadScanword(scanword, dataAll) {
             });
         }
     }
+    let hint = document.getElementById("hint");
+    hint.addEventListener("click", function () {
+        let isDone;
+        if (hintCount !== 0) {
+            isDone = false;
+            document.querySelectorAll('.cell-allocated').forEach(cell => {
+                if (!isDone)
+                    isDone = true;
+                const index = Array.from(scanwordDivElement.children).indexOf(cell);
+                cell.value = scanword.content[index].letter;
+                cell.className = "cell-solved";
+                cell.readOnly = true;
+            });
+            if (isDone)
+                hintCount--;
+            else
+                alert("Никакое слово не выделено. Выделите слово, чтобы использовать подсказку");
+        } else {
+            alert("Подсказки закончились");
+            hint.style.display = "none";
+        }
+    });
 }
 
-function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
+function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement, taskPlaces) {
     function findHorizontal() {
         for (let i = 0; i < m; i++) {
             for (let j = 0; j <= n - word.length; j++) {
@@ -193,6 +227,13 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
                                 if (event.key === 'Backspace' && (j + k) % n !== 0 && scanwordDivElement.children[i * n + j + k - 1].getAttribute("word-id") === null)
                                     scanwordDivElement.children[i * n + j + k - 1].focus();
                             }
+                        });
+                        scanwordDivElement.children[i * n + j + k].addEventListener("click", (e) => {
+                            taskPlaces.forEach(item => {
+                                if (scanwordDivElement.children[item].getAttribute("word-id") === e.target.getAttribute("horizontal-word-id"))
+                                    scanwordDivElement.children[item].click();
+                            });
+                            e.target.focus();
                         });
                     }
                     return true;
@@ -222,6 +263,17 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement) {
                                     scanwordDivElement.children[(i + k - 1) * n + j].focus();
                             }
                         });
+                        let type = "dblclick";
+                        if ((j % n === 0 || scanwordDivElement.children[(i + k) * n + j - 1].getAttribute("word-id") !== null)
+                            && (j % n === n - 1 || scanwordDivElement.children[(i + k) * n + j + 1].getAttribute("word-id") !== null))
+                            type = "click";
+                        scanwordDivElement.children[(i + k) * n + j].addEventListener(type, (e) => {
+                            taskPlaces.forEach(item => {
+                                if (scanwordDivElement.children[item].getAttribute("word-id") === e.target.getAttribute("vertical-word-id"))
+                                    scanwordDivElement.children[item].click();
+                            });
+                            e.target.focus();
+                        });
                     }
                     return true;
                 }
@@ -244,7 +296,7 @@ function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
         word = scanword.content[item].word;
         word = word.toUpperCase();
         let id = scanwordDivElement.children[item].getAttribute("word-id");
-        const isHorizontal = findAndMarkWord(word, id, m, n, scanword, scanwordDivElement);
+        const isHorizontal = findAndMarkWord(word, id, m, n, scanword, scanwordDivElement, tasksPlaces);
         if (isHorizontal)
             scanwordDivElement.children[item].setAttribute("horizontally", "true");
         else

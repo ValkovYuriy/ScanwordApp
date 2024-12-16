@@ -8,17 +8,21 @@
 </head>
 <body>
 
+<button id="hint" class="fixed-button" title="Раскрывает все буквы в выделенном слове">Взять подсказку</button>
+
 <header>
     <div class="title" id="title">Загрузка сканворда...</div>
     <a href="/help" class="help">?</a>
 </header>
 
-<div class="container">
-    <p id="definition">Тест</p>
-    <audio src="" id="melody"></audio>
-    <img src="" alt="Image" id="image">
+<div class="main-container">
+    <div class="container">
+        <p id="definition" class="definition"></p>
+        <audio src="" id="melody"></audio>
+        <img src="" alt="Image" id="image" class="image">
+    </div>
+    <div id="crosswordContainer" class="scanwordContainer"></div>
 </div>
-<div id="crosswordContainer"></div>
 
 <script src="/js/solvingScanword.js"></script>
 
