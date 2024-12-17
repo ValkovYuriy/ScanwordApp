@@ -65,6 +65,7 @@ public class DraftScanwordService {
         draftScanword.setContent(draftScanwordDto.getContent());
         draftScanword.setNumberOfHints(draftScanwordDto.getNumberOfHints());
         draftScanword.setPreview(draftScanwordDto.getPreview());
+        draftScanword.setSolved(draftScanwordDto.getSolved());
         return draftScanwordMapper.toDto(draftScanwordRepository.save(draftScanword));
     }
 

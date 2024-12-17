@@ -182,6 +182,8 @@ function loadScanword(scanword, draft, dataAll) {
                 }
                 if (m * n - wordCount === document.querySelectorAll('.cell-solved').length) {
                     alert("Сканворд полностью разгадан. Поздравляем!");
+                    draft.solved = true;
+                    document.getElementById("save").click();
                 }
             });
         }
