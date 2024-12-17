@@ -46,8 +46,8 @@ public class DraftScanwordController {
     }
 
     @PutMapping
-    public ResponseEntity<ResponseDto<DraftScanwordDto>> updateDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto, @RequestParam UUID id){
-        DraftScanwordDto scanwordDto1 = draftScanwordService.updateDraftScanword(scanwordDto,id);
+    public ResponseEntity<ResponseDto<DraftScanwordDto>> updateDraftScanword(@RequestBody @Valid DraftScanwordDto scanwordDto, @RequestParam String id){
+        DraftScanwordDto scanwordDto1 = draftScanwordService.updateDraftScanword(scanwordDto, UUID.fromString(id));
         return ResponseEntity.ok(new ResponseDto<>("success",scanwordDto1));
     }
 

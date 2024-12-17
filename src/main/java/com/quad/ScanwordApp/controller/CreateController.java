@@ -19,7 +19,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/create_api")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class CreateController {
     private final CreateScanwordService createScanwordService;
 

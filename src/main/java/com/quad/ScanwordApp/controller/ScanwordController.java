@@ -14,11 +14,11 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/scanword")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class ScanwordController {
     
     private final ScanwordService scanwordService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<ScanwordDto> findAllScanwords(){
         List<ScanwordDto> allScanwords = scanwordService.findAllScanwords();
