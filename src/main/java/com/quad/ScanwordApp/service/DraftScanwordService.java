@@ -44,25 +44,28 @@ public class DraftScanwordService {
     public DraftScanwordDto addDraftScanword(DraftScanwordDto draftScanwordDto) {
         User user = userService.getCurrentUser();
         //if(draftScanwordRepository.findAllByOwnerId(user.getId()).stream().noneMatch(draftScanword -> draftScanword.getScanword().getId().equals(draftScanwordDto.getScanwordId()))) {
-            draftScanwordDto.setContent(draftScanwordDto.getContent().stream().map(cell -> Cell.builder()
-                    .row(cell.getRow())
-                    .col(cell.getCol())
-                    .word(cell.getWord())
-                    .task(cell.isTask())
-                    .taskType(cell.getTaskType())
-                    .letter(null)
-                    .build()).toList());
-            DraftScanword draftScanword = draftScanwordMapper.toDraftScanword(draftScanwordDto);
-            draftScanword.setOwner(user);
-            draftScanword.setScanword(scanwordMapper.toScanword(scanwordService.findScanwordById(draftScanwordDto.getScanwordId())));
-            user.getDraftScanwords().add(draftScanword);
-            return draftScanwordMapper.toDto(draftScanwordRepository.save(draftScanword));
+        draftScanwordDto.setContent(draftScanwordDto.getContent().stream().map(cell -> Cell.builder()
+                .row(cell.getRow())
+                .col(cell.getCol())
+                .word(cell.getWord())
+                .task(cell.isTask())
+                .taskType(cell.getTaskType())
+                .letter(null)
+                .build()).toList());
+        DraftScanword draftScanword = draftScanwordMapper.toDraftScanword(draftScanwordDto);
+        draftScanword.setOwner(user);
+        draftScanword.setScanword(scanwordMapper.toScanword(scanwordService.findScanwordById(draftScanwordDto.getScanwordId())));
+        user.getDraftScanwords().add(draftScanword);
+        return draftScanwordMapper.toDto(draftScanwordRepository.save(draftScanword));
         //}
     }
 
     public DraftScanwordDto updateDraftScanword(DraftScanwordDto draftScanwordDto, UUID id) {
         DraftScanword draftScanword = draftScanwordRepository.findById(id).orElseThrow(() -> new NotFoundException(String.format("Черновик сканворда с id %s не найден", id)));
         draftScanword.setContent(draftScanwordDto.getContent());
+        draftScanword.setNumberOfHints(draftScanwordDto.getNumberOfHints());
+        draftScanword.setPreview(draftScanwordDto.getPreview());
+        draftScanword.setSolved(draftScanwordDto.getSolved());
         return draftScanwordMapper.toDto(draftScanwordRepository.save(draftScanword));
     }
 

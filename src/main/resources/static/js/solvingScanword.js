@@ -29,16 +29,16 @@ function loadDictionary(scanword, draft) {
 }
 
 function loadScanword(scanword, draft, dataAll) {
+
     const title = document.getElementById("title");
     const container = document.getElementById('crosswordContainer');
     const scanwordDivElement = document.createElement('div');
-    const m = scanword.height; // ���������� �����
-    const n = scanword.width; // ���������� ��������
+    const m = scanword.height; // строки
+    const n = scanword.width; // столбцы
     let wordCount = 0;
     let tasks = [m * n];
     let tasksPlaces = [wordCount];
     let index = 0;
-    const draftContent = draft.content;
     scanwordDivElement.className = 'scanwordDivElement';
     title.innerText = scanword.name;
     scanwordDivElement.style.gridTemplateColumns = "repeat(" + n + ", 30px)";
@@ -182,31 +182,95 @@ function loadScanword(scanword, draft, dataAll) {
                 }
                 if (m * n - wordCount === document.querySelectorAll('.cell-solved').length) {
                     alert("Сканворд полностью разгадан. Поздравляем!");
+                    draft.solved = true;
+                    document.getElementById("save").click();
                 }
             });
         }
     }
+
+    for (let i = 0; i < m * n; i++) {
+        if (!tasks[i] && draft.content[i].letter !== null) {
+            const horId = scanwordDivElement.children[i].getAttribute("horizontal-word-id");
+            const verId = scanwordDivElement.children[i].getAttribute("vertical-word-id");
+            if (horId != null) {
+                scanwordDivElement.children[tasksPlaces[horId]].click();
+                simulateInput(scanwordDivElement.children[i], draft.content[i].letter)
+            }
+            if (verId != null && scanwordDivElement.children[i].readOnly !== true) {
+                scanwordDivElement.children[i].value = "";
+                scanwordDivElement.children[tasksPlaces[verId]].click();
+                simulateInput(scanwordDivElement.children[i], draft.content[i].letter);
+            }
+        }
+    }
     let hint = document.getElementById("hint");
+    hintCount = draft.numberOfHints;
+    if (hintCount === 0)
+        hint.style.display = "none";
     hint.addEventListener("click", function () {
         let isDone;
-        if (hintCount !== 0) {
-            isDone = false;
-            document.querySelectorAll('.cell-allocated').forEach(cell => {
-                if (!isDone)
-                    isDone = true;
-                const index = Array.from(scanwordDivElement.children).indexOf(cell);
-                cell.value = scanword.content[index].letter;
-                cell.className = "cell-solved";
-                cell.readOnly = true;
-            });
-            if (isDone)
-                hintCount--;
-            else
-                alert("Никакое слово не выделено. Выделите слово, чтобы использовать подсказку");
-        } else {
+        isDone = false;
+        document.querySelectorAll('.cell-allocated').forEach(cell => {
+            if (!isDone)
+                isDone = true;
+            const index = Array.from(scanwordDivElement.children).indexOf(cell);
+            cell.value = scanword.content[index].letter;
+            cell.className = "cell-solved";
+            cell.readOnly = true;
+        });
+        if (isDone)
+            hintCount--;
+        else
+            alert("Никакое слово не выделено. Выделите слово, чтобы использовать подсказку");
+
+        if (hintCount === 0) {
             alert("Подсказки закончились");
             hint.style.display = "none";
         }
+    });
+    let save = document.getElementById("save");
+    save.addEventListener("click", function () {
+        draft.numberOfHints = hintCount;
+        for (let i = 0; i < m * n; i++) {
+            if (!tasks[i]) {
+                if (scanwordDivElement.children[i].value !== "")
+                    draft.content[i].letter = scanwordDivElement.children[i].value;
+                else
+                    draft.content[i].letter = null;
+            }
+        }
+        html2canvas(container).then(canvas => {
+            canvas.toBlob(function (blob) {
+                if (!blob) {
+                    console.error('Ошибка при создании Blob из canvas');
+                    return;
+                }
+
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    const preview = new Uint8Array(event.target.result);
+                    draft.preview = Array.from(preview);
+
+                    fetch('draft-scanword?id=' + draft.id, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(draft)
+                    })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error('Сетевой ответ был не в порядке: ' + response.statusText);
+                            }
+                            return response.json();
+                        })
+                        .then(() => window.location.href = "/")
+                        .catch(error => console.error('Ошибка:', error));
+                };
+                reader.readAsArrayBuffer(blob);
+            });
+        });
     });
 }
 
@@ -302,4 +366,23 @@ function processItems(tasksPlaces, scanword, scanwordDivElement, m, n) {
         else
             scanwordDivElement.children[item].setAttribute("horizontally", "false");
     }
+}
+
+function simulateInput(element, value) {
+    // Создаем новое событие input
+    let event = new InputEvent('input', {
+        bubbles: true,
+        cancelable: true,
+        // Для InputEvent в современных браузерах можно напрямую установить значение
+        data: value,
+        // Для старых браузеров или для большей совместимости
+        inputType: 'insertText',
+        dataTransfer: null
+    });
+
+    // Если вы хотите изменить значение элемента
+    element.value = value;
+
+    // Диспетчеризация события на элементе
+    element.dispatchEvent(event);
 }

@@ -58,7 +58,14 @@ button:active:before {
     position: fixed;
     right: 20px;
     top: 30px;
-    width: 180px;
+    width: 143px;
+}
+
+.fixed-button-1 {
+    position: fixed;
+    right: 20px;
+    top: 90px;
+    width: 143px;
 }
 
 header {
