@@ -1,6 +1,7 @@
 package com.quad.ScanwordApp.service;
 
 import com.quad.ScanwordApp.exception.NotFoundException;
+import com.quad.ScanwordApp.exception.SizeLimitException;
 import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import com.quad.ScanwordApp.model.Dictionary;
 import com.quad.ScanwordApp.dto.DictionaryDto;
@@ -58,6 +59,9 @@ public class DictionaryService {
         if(dictionary != null){
             switch (operation) {
                 case 1:{
+                    if(dictionary.getDictionaryData().size() >= 50000){
+                        throw new SizeLimitException("Размер словаря понятий не может превышать 50000 записей");
+                    }
                     if(dictionary.getDictionaryData().stream().noneMatch(element -> element.getWord().equalsIgnoreCase(word))){
                         List<DictionaryData> dictionaryData = dictionary.getDictionaryData();
                         dictionaryData.add(new DictionaryData(word, definition));

@@ -40,7 +40,7 @@ public class SelectScanwordService {
                 return selectScanwordDtos;
             }
             case "STARTED":{
-                List<DraftScanword> userScanwords = draftScanwordRepository.findAllByOwnerId(userId);
+                List<DraftScanword> userScanwords = draftScanwordRepository.findAllByOwnerId(userId).stream().filter(draftScanword -> !draftScanword.getSolved()).toList();
                 for (DraftScanword draftScanword : userScanwords){
                     selectScanwordDtos.add(SelectScanwordDto.builder()
                                     .scanwordId(draftScanword.getScanword().getId())

@@ -2,6 +2,7 @@ package com.quad.ScanwordApp.controller;
 
 import com.quad.ScanwordApp.dto.ResponseDto;
 import com.quad.ScanwordApp.exception.NotFoundException;
+import com.quad.ScanwordApp.exception.SizeLimitException;
 import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 
 @ControllerAdvice
@@ -28,6 +30,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    public ResponseEntity<ResponseDto<Object>> handleSizeLimitException(SizeLimitException e) {
+        log.error(e.getMessage(), e);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ResponseDto<>(e.getMessage(),null));
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.FORBIDDEN)
     public String handleAccessDeniedException(AccessDeniedException e) {
         log.error(e.getMessage(), e);
         return "access-denied";

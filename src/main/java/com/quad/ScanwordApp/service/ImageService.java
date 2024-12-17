@@ -3,6 +3,7 @@ package com.quad.ScanwordApp.service;
 
 import com.quad.ScanwordApp.dto.ImageDto;
 import com.quad.ScanwordApp.exception.NotFoundException;
+import com.quad.ScanwordApp.exception.SizeLimitException;
 import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import com.quad.ScanwordApp.mapper.ImageMapper;
 import com.quad.ScanwordApp.model.Image;
@@ -30,6 +31,9 @@ public class ImageService {
 
     public ImageDto addImage(ImageDto imageDto) {
         List<Image> images = imageRepository.findAll();
+        if(images.size() >= 100 ) {
+            throw new SizeLimitException("Размер галереи картинок не может превышать 100 записей");
+        }
         if(images.stream().anyMatch(image -> image.getAnswer().equalsIgnoreCase(imageDto.getAnswer()))) {
             throw new WordAlreadyExistsException("Ответ " + imageDto.getAnswer() + " уже существует");
         }

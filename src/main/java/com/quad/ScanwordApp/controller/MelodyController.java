@@ -2,10 +2,11 @@ package com.quad.ScanwordApp.controller;
 
 
 import com.quad.ScanwordApp.dto.MelodyDto;
+import com.quad.ScanwordApp.dto.ResponseDto;
 import com.quad.ScanwordApp.service.MelodyService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,6 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/melody")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('ADMIN')")
 public class MelodyController {
 
     private final MelodyService melodyService;
@@ -43,17 +43,18 @@ public class MelodyController {
 
 
     @PostMapping
-    public MelodyDto addMelody(@RequestParam("audio") MultipartFile melody,
-                                  @RequestParam("question") String question,
-                                  @RequestParam("answer") String answer,
-                                  @RequestParam("name") String name) throws IOException {
+    public ResponseEntity<ResponseDto<MelodyDto>> addMelody(@RequestParam("audio") MultipartFile melody,
+                                                           @RequestParam("question") String question,
+                                                           @RequestParam("answer") String answer,
+                                                           @RequestParam("name") String name) throws IOException {
 
         MelodyDto melodyDto = new MelodyDto();
         melodyDto.setQuestion(question);
         melodyDto.setAnswer(answer);
         melodyDto.setMelody(melody.getBytes());
         melodyDto.setName(name);
-        return melodyService.addMelody(melodyDto);
+        MelodyDto melodyDto1 = melodyService.addMelody(melodyDto);
+        return ResponseEntity.ok(new ResponseDto<>("success",melodyDto1));
     }
 
     @PutMapping
