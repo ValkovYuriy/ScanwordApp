@@ -228,6 +228,11 @@ function loadScanword(scanword, draft, dataAll) {
             alert("Подсказки закончились");
             hint.style.display = "none";
         }
+        if (m * n - wordCount === document.querySelectorAll('.cell-solved').length) {
+            alert("Сканворд полностью разгадан. Поздравляем!");
+            draft.solved = true;
+            document.getElementById("save").click();
+        }
     });
     let save = document.getElementById("save");
     save.addEventListener("click", function () {
