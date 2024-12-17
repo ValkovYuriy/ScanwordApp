@@ -43,7 +43,7 @@ public class DraftScanwordService {
 
     public DraftScanwordDto addDraftScanword(DraftScanwordDto draftScanwordDto) {
         User user = userService.getCurrentUser();
-        if(draftScanwordRepository.findAllByOwnerId(user.getId()).stream().noneMatch(draftScanword -> draftScanword.getScanword().getId().equals(draftScanwordDto.getScanwordId()))) {
+        //if(draftScanwordRepository.findAllByOwnerId(user.getId()).stream().noneMatch(draftScanword -> draftScanword.getScanword().getId().equals(draftScanwordDto.getScanwordId()))) {
             draftScanwordDto.setContent(draftScanwordDto.getContent().stream().map(cell -> Cell.builder()
                     .row(cell.getRow())
                     .col(cell.getCol())
@@ -57,8 +57,7 @@ public class DraftScanwordService {
             draftScanword.setScanword(scanwordMapper.toScanword(scanwordService.findScanwordById(draftScanwordDto.getScanwordId())));
             user.getDraftScanwords().add(draftScanword);
             return draftScanwordMapper.toDto(draftScanwordRepository.save(draftScanword));
-        }
-        return null;
+        //}
     }
 
     public DraftScanwordDto updateDraftScanword(DraftScanwordDto draftScanwordDto, UUID id) {

@@ -2,34 +2,35 @@ package com.quad.ScanwordApp.dto;
 
 
 import com.quad.ScanwordApp.model.json.Cell;
-import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DraftScanwordDto {
+@Builder
+public class SelectScanwordDto {
 
-    private UUID id;
-
-    @NotNull
     private UUID scanwordId;
 
-    private UUID ownerId;
+    private UUID draftId;
 
-    private List<Cell> content = new ArrayList<>();
-
-    private Boolean solved = false;
+    private String name;
 
     private Integer numberOfHints;
 
     private byte[] preview;
 
+    private List<Cell> content;
 
+    public String getBase64Image()
+    {
+        return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(preview);
+    }
 }

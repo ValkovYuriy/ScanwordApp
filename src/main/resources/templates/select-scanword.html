@@ -9,8 +9,8 @@
     <link rel="stylesheet" href="/css/start.css">
 </head>
 <body>
-<div class="container">
-    <h1>Список всех сканвордов</h1>
+<div id="list" class="container">
+<!--    <h1>Список всех сканвордов</h1>-->
     <!-- Прогресс-индикатор -->
     <div class="spinner" id="spinner">
         <div class="spinner-border text-primary" role="status">
@@ -27,26 +27,34 @@
 </div>
 
 <script>
+    let type;
     document.addEventListener('DOMContentLoaded', function() {
-        fetchImages();
+        type = sessionStorage.getItem('clickedButton');
+        const div = document.getElementById('list');
+        const h1 = document.createElement('h1');
+        if(type === "NEW"){
+            h1.textContent = 'Список новых сканвордов';
+        }else{
+            h1.textContent = 'Список сканвордов для разгадывания';
+        }
+        div.insertBefore(h1,div.firstChild);
+        fetchImages(type);
     });
 
-    function fetchImages() {
+    function fetchImages(type) {
         // Показать спиннер перед загрузкой изображений
         const spinner = document.getElementById('spinner');
         spinner.style.display = 'flex';
-
-        fetch('/scanword')
+        fetch('select-api?type=' + type)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Сеть не в порядке');
                 }
                 return response.json();
             })
-            .then(scanwords => {
+            .then(dataALL => {
                 const grid = document.getElementById('image-grid');
-                scanwords.forEach(scanword => {
-                    if(scanword.isCreated) {
+                dataALL.data.forEach(scanword => {
                         const item = document.createElement('div');
                         item.className = 'item';
                         console.debug(scanword);
@@ -74,13 +82,15 @@
                             // Настраиваем кнопку "Выбрать"
                             const selectButton = document.getElementById('select-button');
                             selectButton.hidden = false;
-                            selectButton.setAttribute('data-id', scanword.id);
+                            selectButton.setAttribute('data-id', scanword.scanwordId);
+                            selectButton.setAttribute('data-draft-id', scanword.draftId);
+                            selectButton.setAttribute('data-numberOfHints', scanword.numberOfHints);
+                            selectButton.setAttribute('data-preview', scanword.preview);
                             selectButton.setAttribute('data-content', JSON.stringify(scanword.content));
                             selectButton.scrollIntoView({behavior: 'smooth'});
                         });
 
                         grid.appendChild(item);
-                    }
                 });
 
                 // Скрыть спиннер после загрузки
@@ -95,8 +105,18 @@
     // Обработчик для кнопки "Выбрать"
     document.getElementById('select-button').addEventListener('click', function() {
         const id = this.getAttribute('data-id');
+        const draftId = this.getAttribute('data-draft-id');
+        const numberOfHints = this.getAttribute('data-numberOfHints');
+        const preview = this.getAttribute('data-preview');
         const content = JSON.parse(this.getAttribute('data-content'));
-        postDraftScanword(id,content);
+        if(type === "NEW"){
+            postDraftScanword(id,content,numberOfHints,preview);
+        }
+        else{
+            localStorage.setItem('draft-scanword-id', draftId);
+            localStorage.setItem('scanword-id',id);
+            window.location.href = 'solving-scanword';
+        }
     });
 
     // Обработчик для кнопки "Назад"
@@ -104,10 +124,12 @@
         window.location.href = '/';
     });
 
-    function postDraftScanword(id,content){
+    function postDraftScanword(id,content,numberOfHints,preview){
         const requestData = {
             scanwordId: id,
-            content: content
+            content: content,
+            numberOfHints: numberOfHints,
+            preview: preview
         }
 
         fetch('draft-scanword',{

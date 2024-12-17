@@ -9,7 +9,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 import java.util.UUID;
 
@@ -42,8 +41,4 @@ public class ScanwordDto {
     @NotNull
     private Integer numberOfHints;
 
-    public String getBase64Image()
-    {
-        return "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(preview);
-    }
 }

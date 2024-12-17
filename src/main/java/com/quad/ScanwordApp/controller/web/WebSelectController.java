@@ -6,12 +6,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/start")
+@RequestMapping("/select-scanword")
 @RequiredArgsConstructor
-public class SelectScanwordController
-{
+public class WebSelectController {
+
     @GetMapping
-    public String start() {
-        return "start";
+    public String selectScanword() {
+        return "select-scanword";
     }
+
 }

@@ -6,6 +6,7 @@ import com.quad.ScanwordApp.exception.WordAlreadyExistsException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -26,6 +27,11 @@ public class ErrorHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new ResponseDto<>(e.getMessage(),null));
     }
 
+    @ExceptionHandler
+    public String handleAccessDeniedException(AccessDeniedException e) {
+        log.error(e.getMessage(), e);
+        return "access-denied";
+    }
 
     @ExceptionHandler
     public ResponseEntity<ResponseDto<Object>> handleException(Throwable e) {

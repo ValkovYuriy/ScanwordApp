@@ -55,4 +55,11 @@ public class DraftScanword {
     @Column(name = "is_solved")
     private Boolean solved;
 
+
+    @Column(name = "number_of_hints")
+    private Integer numberOfHints;
+
+
+    @Column(name = "preview")
+    private byte[] preview;
 }

@@ -2,7 +2,6 @@ package com.quad.ScanwordApp.dto;
 
 
 import com.quad.ScanwordApp.model.DraftScanword;
-import com.quad.ScanwordApp.model.Scanword;
 import com.quad.ScanwordApp.model.enums.Role;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -27,8 +26,6 @@ public class UserDto {
     private String password;
 
     private Role role;
-
-    private List<Scanword> createdScanwords = new ArrayList<>();
 
     private List<DraftScanword> draftScanwords = new ArrayList<>();
 }

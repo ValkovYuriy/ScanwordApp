@@ -23,6 +23,7 @@ import java.util.UUID;
 public class CreateController {
     private final CreateScanwordService createScanwordService;
 
+
     @GetMapping("/{dictionaryId}")
     public ResponseEntity<ResponseDto<Data>> getData(@PathVariable String dictionaryId){
         ResponseDto<Data> response = new ResponseDto<>("success", createScanwordService.getData(UUID.fromString(dictionaryId)));

@@ -43,10 +43,12 @@
                 </div>
                 <div class="user-buttons-container authenticated-body">
                     <div class="mt-4 button">
-                        <a href="/start" class="btn btn-primary btn-user">Начать разгадывание нового сканворда</a>
+<!--                        <button id="buttonA">Начать разгадывание нового сканворда</button>-->
+                        <a id="buttonA" href="/select-scanword" class="btn btn-primary btn-user">Начать разгадывание нового сканворда</a>
                     </div>
                     <div class="mt-4 button">
-                        <a href="/game" class="btn btn-primary btn-user">Продолжить разгадывание сканворда</a>
+<!--                        <button id="buttonB">Продолжить разгадывание сканворда</button>-->
+                        <a id="buttonB" href="/select-scanword" class="btn btn-primary btn-user">Продолжить разгадывание сканворда</a>
                     </div>
                 </div>
             </div>
@@ -72,5 +74,16 @@
 <!-- Bootstrap JS and dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    document.getElementById('buttonA').onclick = function() {
+        sessionStorage.setItem('clickedButton', 'NEW');
+        window.location.href = 'select-scanword';
+    };
+    document.getElementById('buttonB').onclick = function() {
+        sessionStorage.setItem('clickedButton', 'STARTED');
+        window.location.href = 'select-scanword';
+    };
+
+</script>
 </body>
 </html>

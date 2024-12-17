@@ -3,5 +3,7 @@ CREATE TABLE IF NOT EXISTS draft_scanword(
     scanword_id UUID REFERENCES scanword(id),
     owner_id UUID REFERENCES users(id),
     content jsonb,
-    is_solved boolean
+    is_solved boolean,
+    number_of_hints integer,
+    preview bytea
 )
