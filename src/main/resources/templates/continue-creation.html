@@ -138,7 +138,6 @@
             padding: 10px; /* Отступы для фона */
             border-radius: 5px; /* Закругление углов */
         }
-
     </style>
 </head>
 <body>
@@ -178,9 +177,12 @@
 <div id="checkmark" class="checkmark"></div>
 
 <script>
-    let scanwordName = localStorage.getItem('scanwordName');
-    let width = +localStorage.getItem('scanwordWidth');
-    let height = +localStorage.getItem('scanwordHeight');
+    let scanwordName = null;
+    let width = null;
+    let height = null;
+    let dictionaryId = null;;
+    let sc_data = [];
+    let numberOfHints = null;
     const maxLineLength = 10;
     const minLineLength = 2;
     let dictionaryData = [];
@@ -194,13 +196,12 @@
     let answerAdded = true;
     let deleteMode = false;
     let currentID = 1;
-    let choosen = true;
-    let dictionaryId;
+    let choosen = true
+    let scanwordId = null;
 
     document.addEventListener('DOMContentLoaded', async function () {
-        document.title = `Сканворд: ${scanwordName}`;
-
         await getData();
+        document.title = `Сканворд: ${scanwordName}`;
         createGrid(width, height);
         document.addEventListener('mousedown', handleMouseDown);
         document.addEventListener('mousemove', handleMouseMove);
@@ -209,8 +210,24 @@
 
     });
 
-    async function getData(){
-        dictionaryId = localStorage.getItem('dictionaryId');
+    async function getData()
+    {
+        await fetch('scanword/not_created',{
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json' // Обязательно укажите тип содержимого
+            }
+        }).then(response => response.json())
+            .then(scanword =>{
+            console.log(scanword);
+            scanwordId = scanword.id;
+            dictionaryId = scanword.dictionaryId;
+            scanwordName = scanword.name;
+            width = scanword.width;
+            height = scanword.height;
+            scanword.content.forEach(cell => sc_data.push(cell));
+            numberOfHints = scanword.numberOfHints;
+        });
         try
         {
             const response = await fetch('/create_api/' + dictionaryId);
@@ -241,6 +258,29 @@
                 cell.dataset.row = i;
                 cell.dataset.col = j;
                 grid.appendChild(cell);
+            }
+        }
+        for (const dataCell of sc_data) {
+            const row = dataCell.row;
+            const col = dataCell.col;
+            const cell = document.querySelector(`.cell[data-row="${row}"][data-col="${col}"]`);
+            if (cell)
+            {
+                if(dataCell.task)
+                {
+                    cell.classList.add("answer-final");
+                    cell.dataset.word = dataCell.word;
+                    cell.textContent = dataCell.taskType === "VERBAL"? '📄' : ( dataCell.taskType === "IMAGE"? '🖼️' : '🎵');
+                }
+                else
+                {
+                    if(dataCell.letter !== null)
+                    {
+                        cell.classList.add("highlight");
+                        cell.classList.add("texted");
+                        cell.textContent = dataCell.letter;
+                    }
+                }
             }
         }
     }
@@ -309,8 +349,8 @@
                         numberOfHints: localStorage.getItem('hintsCount') // Замените на количество подсказок, если есть
                     };
                     // Отправляем данные через fetch
-                    fetch('/scanword', {
-                        method: 'POST',
+                    fetch(`/scanword?id=${scanwordId}`, {
+                        method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
                         },
@@ -477,7 +517,7 @@
             let cellIdToRemove;
             if(cell.classList.contains('highlight'))
             {
-                cellIdToRemove = cellClasses[-1]; // Удаляем только highlight клетки (всегда последний элемент)
+                cellIdToRemove = cellClasses[cellClasses.length - 1]; // Удаляем только highlight клетки (всегда последний элемент)
             }
             else
             {

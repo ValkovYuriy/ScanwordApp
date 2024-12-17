@@ -79,5 +79,4 @@ public class DictionaryService {
             dictionaryRepository.save(dictionary);
         }
     }
-
 }

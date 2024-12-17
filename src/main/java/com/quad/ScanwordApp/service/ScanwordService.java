@@ -56,6 +56,11 @@ public class ScanwordService {
         scanword.setName(scanwordDto.getName());
         scanword.setWidth(scanwordDto.getWidth());
         scanword.setHeight(scanwordDto.getHeight());
+        scanword.setDictionary(dictionaryRepository.findById(scanwordDto.getDictionaryId()).orElse(null));
+        scanword.setPreview(scanwordDto.getPreview());
+        scanword.setContent(scanwordDto.getContent());
+        scanword.setIsCreated(scanwordDto.getIsCreated());
+        scanword.setNumberOfHints(scanwordDto.getNumberOfHints());
         return scanwordMapper.toDto(scanwordRepository.save(scanword));
     }
 

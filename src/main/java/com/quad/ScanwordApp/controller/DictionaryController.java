@@ -59,5 +59,4 @@ public class DictionaryController {
     public void updateDictionary(@PathVariable UUID id, @RequestParam String word, @RequestParam String definition, @RequestParam int operation){
         dictionaryService.updateDictionary(id,word,definition,operation);
     }
-
 }

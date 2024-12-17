@@ -32,6 +32,10 @@ public class ScanwordController {
         List<ScanwordDto> allScanwords = scanwordService.findAllScanwords();
         return allScanwords;
     }
+    @GetMapping("/not_created")
+    public ScanwordDto findNotCreatedScanword(){
+        return scanwordService.findAllScanwords().stream().filter(scanword -> !scanword.getIsCreated()).findFirst().get();
+    }
 
     @GetMapping("/{id}")
     public ScanwordDto findScanwordById(@PathVariable UUID id){
