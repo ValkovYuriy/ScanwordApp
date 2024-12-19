@@ -63,6 +63,12 @@
             background-color: white;
             transition: background-color 0.2s ease; /* Плавный переход цвета */
             text-align: center;
+            -webkit-touch-callout: none; /* iOS Safari */
+            -webkit-user-select: none; /* Safari */
+            -khtml-user-select: none; /* Konqueror HTML */
+            -moz-user-select: none; /* Old versions of Firefox */
+            -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
         }
 
         .preview-highlight {
@@ -250,7 +256,6 @@
         grid.style.gridTemplateColumns = `repeat(${cols}, 25px)`;
         grid.style.gridTemplateRows = `repeat(${rows}, 25px)`;
         grid.innerHTML = '';
-
         for (let i = 0; i < rows; i++) {
             for (let j = 0; j < cols; j++) {
                 const cell = document.createElement('div');
@@ -281,6 +286,67 @@
                         cell.textContent = dataCell.letter;
                     }
                 }
+            }
+        }
+        for (const dataCell of sc_data) {
+            if (dataCell.task) {
+                const questionRow = dataCell.row;
+                const questionCol = dataCell.col;
+                const word = dataCell.word;
+                const taskCell = document.querySelector(`.cell[data-row="${questionRow}"][data-col="${questionCol}"]`);
+                const taskID = `id-${currentID}`;
+                taskCell.classList.add(taskID);
+                taskCell.dataset.word = word;
+                findWord(word, taskCell);
+                currentID++;
+            }
+        }
+    }
+
+    function findWord(word, taskCell)
+    {
+        const row = parseInt(taskCell.dataset.row);
+        const col = parseInt(taskCell.dataset.col);
+        const directions = [{dr:-1, dc:-1}, {dr:-1, dc:0}, {dr:-1, dc:1} , {dr:0, dc:-1}, {dr:0, dc:1}, {dr:1, dc:-1}, {dr:1, dc:0}, {dr:1, dc:1}]
+        let cells = [];
+        for(const {dr, dc} of directions)
+        {
+            const cell = document.querySelector(`.cell[data-row="${row + dr}"][data-col="${col + dc}"]`);
+            if(cell !== null && cell.textContent !== "" && word.startsWith(cell.textContent))
+            {
+                cells.push(cell);
+                let horizontal = true;
+                let vertical = true;
+                let concat = cell.textContent;
+                for(let i = 1; i < word.length; i++)
+                {
+                    const sec_cell_v = document.querySelector(`.cell[data-row="${row + dr + i}"][data-col="${col + dc}"]`);
+                    const sec_cell_h = document.querySelector(`.cell[data-row="${row + dr}"][data-col="${col + dc + i}"]`);
+                    if(horizontal && sec_cell_h.textContent !== "" && word.startsWith(concat + sec_cell_h.textContent))
+                    {
+                        vertical = false;
+                        concat += sec_cell_h.textContent;
+                        cells.push(sec_cell_h);
+                    }
+                    if(vertical && sec_cell_v.textContent !== "" && word.startsWith(concat + sec_cell_v.textContent))
+                    {
+                        horizontal = false;
+                        concat += sec_cell_v.textContent;
+                        cells.push(sec_cell_v);
+                    }
+                }
+            }
+            if(cells.length === word.length)
+            {
+                cells.forEach(cell =>
+                {
+                    if(!word.includes(cell.textContent))
+                    {
+                        console.log(word, taskCell);
+                        return;
+                    }
+                });
+                cells.forEach(cell => cell.classList.add(`id-${currentID}`));
             }
         }
     }

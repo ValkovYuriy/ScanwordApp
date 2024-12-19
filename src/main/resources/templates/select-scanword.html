@@ -54,6 +54,9 @@
             })
             .then(dataALL => {
                 const grid = document.getElementById('image-grid');
+                const buttonContainer = document.getElementById('button-container');
+                buttonContainer.style.display = 'flex';
+                buttonContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
                 dataALL.data.forEach(scanword => {
                         const item = document.createElement('div');
                         item.className = 'item';
@@ -62,13 +65,9 @@
                         img.src = scanword.base64Image;
                         img.alt = "Сканворд";
                         img.style.maxWidth = "100%";
-
                         item.prepend(img);
                         item.innerHTML += `<p>Сканворд: ${scanword.name}</p>`;
                         item.innerHTML += `<p>Количество подсказок: ${scanword.numberOfHints}</p>`;
-                        const buttonContainer = document.getElementById('button-container');
-                        buttonContainer.style.display = 'flex';
-                        buttonContainer.scrollIntoView({behavior: 'smooth', block: 'center'});
                         const backButton = document.getElementById('back-button');
                         backButton.hidden = false;
                         // Добавляем обработчик клика на элемент
