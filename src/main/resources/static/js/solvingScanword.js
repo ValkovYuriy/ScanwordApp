@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let isHorizontal = true;
 let CurrentId = "";
 let hintCount = 3;
+const russianLetterRegex = /^[А-Яа-я]$/;
 
 function loadDraft(scanword) {
     const draftId = localStorage.getItem("draft-scanword-id");
@@ -137,6 +138,13 @@ function loadScanword(scanword, draft, dataAll) {
                     cell.className = "cell-allocated";
                 }
             });
+            document.querySelectorAll('.cell-wrong').forEach(cell => {
+                if (cell.getAttribute("horizontal-word-id") === id ||
+                    cell.getAttribute("vertical-word-id") === id) {
+                    cell.className = "cell-allocated";
+                }
+            });
+
             isHorizontal = scanwordDivElement.children[item].getAttribute("horizontally");
             //выделяем 1 букву слова на сканворде, соответствующую заданию
             let pos = 0;
@@ -152,6 +160,10 @@ function loadScanword(scanword, draft, dataAll) {
         if (!tasks[i]) {
             // добавляем обработчик ввода на клетки с буквами
             scanwordDivElement.children[i].addEventListener('input', function (e) {
+                if (e.data !== null && !russianLetterRegex.test(e.data)) {
+                    e.target.value = "";
+                    return;
+                }
                 e.target.value = e.target.value.toUpperCase();
                 const wordLength = scanword.content[tasksPlaces[CurrentId]].word.length;
                 let inputWord = "";
@@ -284,13 +296,16 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement, taskPlace
         for (let i = 0; i < m; i++) {
             for (let j = 0; j <= n - word.length; j++) {
                 let slice = scanword.content.slice(i * n + j, i * n + j + word.length).map(item => item.letter).join('');
-                if (slice === word && (j + word.length + 1 > n ||
-                    scanwordDivElement.children[i * n + j + word.length].getAttribute("word-id") != null)) {
+                if (slice === word && (j - 1 < 0 || scanwordDivElement.children[i * n + j - 1].getAttribute("word-id") != null)
+                    && (j + word.length >= n || scanwordDivElement.children[i * n + j + word.length].getAttribute("word-id") != null)) {
                     for (let k = 0; k < word.length; k++) {
                         scanwordDivElement.children[i * n + j + k].setAttribute("horizontal-word-id", id);
                         // добавляем обработчик горизонтального движения
                         scanwordDivElement.children[i * n + j + k].addEventListener("keyup", (event) => {
                             if (isHorizontal === "true") {
+                                if (!russianLetterRegex.test(event.key) && event.key !== 'Backspace') {
+                                    return;
+                                }
                                 if (event.key !== 'Backspace' && k < word.length - 1)
                                     scanwordDivElement.children[i * n + j + k + 1].focus();
                                 if (event.key === 'Backspace' && (j + k) % n !== 0 && scanwordDivElement.children[i * n + j + k - 1].getAttribute("word-id") === null)
@@ -319,13 +334,20 @@ function findAndMarkWord(word, id, m, n, scanword, scanwordDivElement, taskPlace
                 for (let k = 0; k < word.length; k++) {
                     slice += scanword.content[(i + k) * n + j].letter;
                 }
-                if (slice === word && ((i + word.length) * n + j >= scanwordDivElement.children.length ||
-                    scanwordDivElement.children[(i + word.length) * n + j].getAttribute("word-id") != null)) {
+                if (slice === word &&
+                    ((i - 1) * n + j < 0 ||
+                        scanwordDivElement.children[(i - 1) * n + j].getAttribute("word-id") != null)
+                    &&
+                    ((i + word.length) * n + j >= m * n ||
+                        scanwordDivElement.children[(i + word.length) * n + j].getAttribute("word-id") != null)) {
                     for (let k = 0; k < word.length; k++) {
                         scanwordDivElement.children[(i + k) * n + j].setAttribute("vertical-word-id", id);
                         // добавляем обработчик вертикального движения
                         scanwordDivElement.children[(i + k) * n + j].addEventListener("keyup", (event) => {
                             if (isHorizontal === "false") {
+                                if (!russianLetterRegex.test(event.key) && event.key !== 'Backspace') {
+                                    return;
+                                }
                                 if (event.key !== 'Backspace' && k < word.length - 1)
                                     scanwordDivElement.children[(i + k + 1) * n + j].focus();
                                 if (event.key === 'Backspace' && i + k - 1 >= 0 && scanwordDivElement.children[(i + k - 1) * n + j].getAttribute("word-id") === null)
@@ -390,4 +412,16 @@ function simulateInput(element, value) {
 
     // Диспетчеризация события на элементе
     element.dispatchEvent(event);
+}
+
+function simulateDblClick(element) {
+    // Создаем новое событие input
+    const dblClickEvent = new MouseEvent('dblclick', {
+        bubbles: true,
+        cancelable: true,
+        view: window,
+        detail: 2
+    });
+    // Диспетчеризация события на элементе
+    element.dispatchEvent(dblClickEvent);
 }
