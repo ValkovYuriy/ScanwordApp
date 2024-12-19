@@ -21,17 +21,6 @@ public class ScanwordService {
     private final ScanwordMapper scanwordMapper;
     private final DictionaryRepository dictionaryRepository;
 
-    public boolean createScanword(ScanwordDto scanwordDto) {
-        Scanword scanword = scanwordMapper.toScanword(scanwordDto);
-        if(scanwordRepository.existsById(scanword.getId())) {
-            return false;
-        }
-        else
-        {
-            scanwordRepository.save(scanword);
-            return true;
-        }
-    }
 
     public List<ScanwordDto> findAllScanwords() {
         return scanwordRepository.findAll()
@@ -46,6 +35,9 @@ public class ScanwordService {
                 .orElseThrow(() -> new NotFoundException(String.format("Сканворд с id %s не найден", id))));
     }
     public ScanwordDto addScanword(ScanwordDto scanwordDto) {
+        if(!scanwordDto.getIsCreated() && findAllScanwords().stream().anyMatch(scanword -> !scanword.getIsCreated())) {
+            return null;
+        }
         Scanword scanword = scanwordMapper.toScanword(scanwordDto);
         scanword.setDictionary(dictionaryRepository.findById(scanwordDto.getDictionaryId()).orElse(null));
         return scanwordMapper.toDto(scanwordRepository.save(scanword));
@@ -57,9 +49,9 @@ public class ScanwordService {
         scanword.setWidth(scanwordDto.getWidth());
         scanword.setHeight(scanwordDto.getHeight());
         scanword.setDictionary(dictionaryRepository.findById(scanwordDto.getDictionaryId()).orElse(null));
-        scanword.setPreview(scanwordDto.getPreview());
         scanword.setContent(scanwordDto.getContent());
         scanword.setIsCreated(scanwordDto.getIsCreated());
+        scanword.setPreview(scanwordDto.getPreview());
         scanword.setNumberOfHints(scanwordDto.getNumberOfHints());
         return scanwordMapper.toDto(scanwordRepository.save(scanword));
     }
