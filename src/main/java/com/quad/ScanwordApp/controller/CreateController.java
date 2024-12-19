@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.UUID;
@@ -28,8 +29,8 @@ public class CreateController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/{regex}")
-    public ResponseEntity<ResponseDto<FilteredData>> getFilteredData(@PathVariable String regex, @RequestBody Data data){
+    @PostMapping()
+    public ResponseEntity<ResponseDto<FilteredData>> getFilteredData(@RequestParam String regex, @RequestBody Data data){
         ResponseDto<FilteredData> response = new ResponseDto<>("success",createScanwordService.getFilteredData(regex, data));
         return ResponseEntity.ok(response);
     }
