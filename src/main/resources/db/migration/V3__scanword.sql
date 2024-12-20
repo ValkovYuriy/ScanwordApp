@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS scanword(
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    name VARCHAR(20) NOT NULL,
+    name VARCHAR(20) UNIQUE NOT NULL,
     width INT NOT NULL ,
     height INT NOT NULL,
     preview bytea NOT NULL,

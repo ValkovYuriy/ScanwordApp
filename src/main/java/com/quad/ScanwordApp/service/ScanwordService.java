@@ -59,4 +59,8 @@ public class ScanwordService {
     public void deleteScanword(UUID id) {
         scanwordRepository.deleteById(id);
     }
+
+    public Boolean checkUniqueName(String name) {
+        return findAllScanwords().stream().anyMatch(scanword -> scanword.getName().equalsIgnoreCase(name));
+    }
 }

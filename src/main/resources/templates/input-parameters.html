@@ -40,16 +40,25 @@
 
     document.getElementById("scanwordForm").addEventListener("submit", function (event) {
         event.preventDefault();
+        const name = document.getElementById('name').value;
+        fetch(`scanword?name=${name}`)
+            .then(response => response.json())
+            .then(data => {
+                if(!data){
+                    // Сохранение введенных данных в localStorage
+                    localStorage.setItem('scanwordName', name);
+                    localStorage.setItem('scanwordWidth', document.getElementById('x').value);
+                    localStorage.setItem('scanwordHeight', document.getElementById('y').value);
+                    localStorage.setItem('hintsCount', document.getElementById('hints').value);
+                    localStorage.setItem('dictionaryId', document.getElementById('dictionary').value);
 
-        // Сохранение введенных данных в localStorage
-        localStorage.setItem('scanwordName', document.getElementById('name').value);
-        localStorage.setItem('scanwordWidth', document.getElementById('x').value);
-        localStorage.setItem('scanwordHeight', document.getElementById('y').value);
-        localStorage.setItem('hintsCount', document.getElementById('hints').value);
-        localStorage.setItem('dictionaryId', document.getElementById('dictionary').value);
-
-        // Переход на страницу создания сканворда
-        window.location.href = 'scanword-creation';
+                    // Переход на страницу создания сканворда
+                    window.location.href = 'scanword-creation';
+                }
+                else{
+                    alert("Скановорд с названием " + name + " уже существует");
+                }
+            });
     });
     document.addEventListener("DOMContentLoaded", function () {
         // Функция для подгрузки словарей

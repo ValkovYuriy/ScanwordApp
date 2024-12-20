@@ -60,4 +60,9 @@ public class ScanwordController {
         scanwordService.deleteScanword(id);
     }
 
+
+    @GetMapping(params = "name")
+    public Boolean checkUniqueName(@RequestParam String name){
+        return scanwordService.checkUniqueName(name);
+    }
 }

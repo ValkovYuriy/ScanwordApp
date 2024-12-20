@@ -531,8 +531,6 @@
             return;
         }
         if (!cell.classList.contains('answer-final') && !cell.classList.contains('answer-preview') && choosen && answerAdded) {
-            answerAdded = false;
-            choosen = false;
             lastFinalCells = [];
             isMouseDown = true;
             startCell = cell;
@@ -542,7 +540,7 @@
     }
 
     function handleMouseMove(event) {
-        if (!isMouseDown) return;
+        if (!isMouseDown || !answerAdded || !choosen) return;
         const cell = event.target.closest('.cell');
 
         if (!cell) return;
@@ -643,6 +641,8 @@
     function handleMouseUp() {
         if (!isMouseDown) return;
         isMouseDown = false;
+        answerAdded = false;
+        choosen = false;
 
         // Проверка на длину выделенной линии
         if (selectedCells.length >= minLineLength && selectedCells.length <= maxLineLength) {
@@ -717,6 +717,7 @@
             getWords();
             currentID++;
             clearPreview(); // Возврат к пункту 1 без сброса
+            choosen = false;
         }
     });
 
