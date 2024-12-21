@@ -37,8 +37,9 @@
         <button id="melody-gallery-button">Галерея мелодий</button>
         <button id="image-gallery-button">Галерея картинок</button>
         <button id="add-row">добавить запись</button>
+        <button id="alphabet-sort" onclick="sortTable(0)">сортировка по алфавиту</button>
+        <button id="length-sort" onclick="sortTableByLength(0)">сортировка по длине</button>
         <div id="error" class="error-message"></div>
-
 
     </div>
 </div>
@@ -631,7 +632,7 @@
         return nonEnglishPattern.test(text);
     }
 
-    // Функция сортировки таблицы
+    // Функция сортировки таблицы по алфавиту
     function sortTable(columnIndex) {
         const table = document.getElementById('dictionary-table');
         const tbody = table.querySelector('tbody');
@@ -645,6 +646,22 @@
         });
         rows.forEach(row => tbody.appendChild(row)); // Перемещение отсортированных строк в tbody
     }
+
+    // Функция сортировки таблицы по длине
+    function sortTableByLength(columnIndex) {
+        const table = document.getElementById('dictionary-table');
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        rows.sort((a, b) => {
+            const cellA = a.cells[columnIndex].textContent.trim();
+            const cellB = b.cells[columnIndex].textContent.trim();
+            return cellA.length - cellB.length; // Сравнение по длине
+        });
+        rows.forEach(row => tbody.appendChild(row)); // Перемещение отсортированных строк в tbody
+    }
+
+
 </script>
 </body>
 </html>
