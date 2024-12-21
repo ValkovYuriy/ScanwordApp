@@ -355,6 +355,7 @@
         let cells = document.querySelectorAll(`.cell`);
         let scanwordData = [];
         let isCompleted = null;
+        let isEmpty = true;
         cells.forEach(cell => {
             let row = cell.dataset.row;;
             let col = cell.dataset.col;;
@@ -375,6 +376,7 @@
                 {
                     letter = cell.textContent;
                 }
+                isEmpty = false;
             }
             else{
                 isCompleted = false;
@@ -394,6 +396,11 @@
                 cell.textContent = "";
             }
         });
+        if(isEmpty)
+        {
+            alert("Нельзя сохранять пустой сканворд!");
+            return;
+        }
         const grid = document.getElementById('scanwordGrid'); // Получаем элемент, который хотим сделать скриншотом
         // Создаём скриншот
         html2canvas(grid).then(canvas => {
@@ -643,7 +650,6 @@
         isMouseDown = false;
         answerAdded = false;
         choosen = false;
-
         // Проверка на длину выделенной линии
         if (selectedCells.length >= minLineLength && selectedCells.length <= maxLineLength) {
             selectedCells.forEach(cell => {
@@ -716,7 +722,7 @@
             lastFinalCells.push(cell);
             getWords();
             currentID++;
-            clearPreview(); // Возврат к пункту 1 без сброса
+            clearPreview();
             choosen = false;
         }
     });
