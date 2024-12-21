@@ -20,16 +20,21 @@ public class HelpController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth != null && auth.isAuthenticated() && !(auth instanceof AnonymousAuthenticationToken))
         {
+            model.addAttribute("isAuthenticated", true);
             if(auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN")))
             {
                 model.addAttribute("isAdmin", true);
+                model.addAttribute("isUser", false);
             }
             else {
                 model.addAttribute("isUser", true);
+                model.addAttribute("isAdmin", false);
             }
         }
         else {
             model.addAttribute("isAuthenticated", false);
+            model.addAttribute("isUser", false);
+            model.addAttribute("isAdmin", false);
         }
         return "help";
     }
