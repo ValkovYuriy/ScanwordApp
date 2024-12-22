@@ -413,15 +413,3 @@ function simulateInput(element, value) {
     // Диспетчеризация события на элементе
     element.dispatchEvent(event);
 }
-
-function simulateDblClick(element) {
-    // Создаем новое событие input
-    const dblClickEvent = new MouseEvent('dblclick', {
-        bubbles: true,
-        cancelable: true,
-        view: window,
-        detail: 2
-    });
-    // Диспетчеризация события на элементе
-    element.dispatchEvent(dblClickEvent);
-}

@@ -14,17 +14,21 @@
         <div class="card authenticated">
             <div class="card-body">
                 <div class="card-header">
-                    <h2 class="card-title">Hello there, <span th:text="${username}"!></span></h2>
+                    <h2 class="card-title">Hello there, <span th:text="${username}" !></span></h2>
                 </div>
                 <div class="user-buttons-container authenticated-body">
                     <div class="mt-4 button">
-                        <a href="/input-parameters" class="btn btn-primary btn-user">Начать создание нового сканворда</a>
+                        <a href="/input-parameters" class="btn btn-primary btn-user">Начать создание нового
+                            сканворда</a>
                     </div>
                     <div class="mt-4 button">
                         <a href="/continue-creation" class="btn btn-primary btn-user">Продолжить создание сканворда</a>
                     </div>
                     <div class="mt-4 button">
                         <a href="/work-with-dictionaries" class="btn btn-primary btn-user">Работа со словарями</a>
+                    </div>
+                    <div class="mt-4 button">
+                        <a href="/help" class="btn btn-primary btn-user">Справка</a>
                     </div>
                 </div>
             </div>
@@ -39,16 +43,21 @@
         <div class="card authenticated">
             <div class="card-body">
                 <div class="card-header">
-                    <h2 class="card-title">Hello there, <span th:text="${username}"!></span></h2>
+                    <h2 class="card-title">Hello there, <span th:text="${username}" !></span></h2>
                 </div>
                 <div class="user-buttons-container authenticated-body">
                     <div class="mt-4 button">
-<!--                        <button id="buttonA">Начать разгадывание нового сканворда</button>-->
-                        <a id="buttonA" href="/select-scanword" class="btn btn-primary btn-user">Начать разгадывание нового сканворда</a>
+                        <!--                        <button id="buttonA">Начать разгадывание нового сканворда</button>-->
+                        <a id="buttonA" href="/select-scanword" class="btn btn-primary btn-user">Начать разгадывание
+                            нового сканворда</a>
                     </div>
                     <div class="mt-4 button">
-<!--                        <button id="buttonB">Продолжить разгадывание сканворда</button>-->
-                        <a id="buttonB" href="/select-scanword" class="btn btn-primary btn-user">Продолжить разгадывание сканворда</a>
+                        <!--                        <button id="buttonB">Продолжить разгадывание сканворда</button>-->
+                        <a id="buttonB" href="/select-scanword" class="btn btn-primary btn-user">Продолжить разгадывание
+                            сканворда</a>
+                    </div>
+                    <div class="mt-4 button">
+                        <a href="/help" class="btn btn-primary btn-user">Справка</a>
                     </div>
                 </div>
             </div>
@@ -75,11 +84,11 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    document.getElementById('buttonA').onclick = function() {
+    document.getElementById('buttonA').onclick = function () {
         sessionStorage.setItem('clickedButton', 'NEW');
         window.location.href = 'select-scanword';
     };
-    document.getElementById('buttonB').onclick = function() {
+    document.getElementById('buttonB').onclick = function () {
         sessionStorage.setItem('clickedButton', 'STARTED');
         window.location.href = 'select-scanword';
     };
